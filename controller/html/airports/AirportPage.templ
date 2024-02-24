@@ -5,7 +5,7 @@ import (
 	"github.com/FACorreiaa/Aviation-tracker/controller/models"
 )
 
-templ AirportPage(table templ.Component, sidebar []models.SidebarItem, title, description string) {
+templ AirportPage(table templ.Component, sidebar []models.SidebarItem, title, description string, ap []models.Airport) {
 	<div>
 		@components.BannerComponent(title, description)
 		<div class="flex items-center justify-center flex-grow">
@@ -13,9 +13,12 @@ templ AirportPage(table templ.Component, sidebar []models.SidebarItem, title, de
 				<div class="w-2/12">
 					@components.SidebarComponent(sidebar)
 				</div>
-				<div class="w-11/12 pl-2">
+				<div class="w-5/12 pl-2 mr-2">
 					@table
 				</div>
+				<div class="w-5/12 ml-10 pt-2">
+                					@AirportMap(ap)
+                				</div>
 			</div>
 		</div>
 	</div>
