@@ -5,7 +5,7 @@ import (
 	"github.com/FACorreiaa/Aviation-tracker/controller/models"
 )
 
-templ LocationsLayoutPage(title, description string, component templ.Component, sidebar []models.SidebarItem) {
+templ CountryLayoutPage(title, description string, component templ.Component, sidebar []models.SidebarItem, c []models.Country) {
 	<div>
 		@components.BannerComponent(title, description)
 		<div class="flex items-center justify-center flex-grow">
@@ -13,9 +13,12 @@ templ LocationsLayoutPage(title, description string, component templ.Component, 
 				<div class="w-2/12">
 					@components.SidebarComponent(sidebar)
 				</div>
-				<div class="w-11/12 ml-10 p-2">
+				<div class="w-6/12 ml-10 p-2">
 					@component
 				</div>
+				<div class="w-6/12 ml-10 pt-2">
+                                					@CountryMap(c)
+                                				</div>
 			</div>
 		</div>
 	</div>
