@@ -1,23 +1,20 @@
-package app
+package handlers
 
 import (
-	"context"
 	"errors"
-	"math"
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
-
-	svg2 "github.com/FACorreiaa/Aviation-tracker/app/svg"
-	airport "github.com/FACorreiaa/Aviation-tracker/app/view/airports"
-
-	"github.com/a-h/templ"
+	"context"
 
 	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	svg2 "github.com/FACorreiaa/Aviation-tracker/app/svg"
+	airport "github.com/FACorreiaa/Aviation-tracker/app/view/airports"
+	"github.com/a-h/templ"
+	"github.com/gorilla/mux"
 )
 
-func (h *Handlers) getAirports(_ http.ResponseWriter, r *http.Request) (int, []models.Airport, error) {
+func (h *Handler) getAirports(_ http.ResponseWriter, r *http.Request) (int, []models.Airport, error) {
 	pageSize := 30
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	orderBy := r.URL.Query().Get("orderBy")
@@ -28,7 +25,7 @@ func (h *Handlers) getAirports(_ http.ResponseWriter, r *http.Request) (int, []m
 		page = 1
 	}
 
-	a, err := h.core.airports.GetAirports(context.Background(), page, pageSize, orderBy, sortBy)
+	a, err := h.service.GetAirports(context.Background(), page, pageSize, orderBy, sortBy)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -36,27 +33,7 @@ func (h *Handlers) getAirports(_ http.ResponseWriter, r *http.Request) (int, []m
 	return page, a, nil
 }
 
-func (h *Handlers) getAirportsLocationService() ([]models.Airport, error) {
-	a, err := h.core.airports.GetAirportsLocation(context.Background())
-	if err != nil {
-		HandleError(err, "Error fetching airports locations")
-		return nil, err
-	}
-
-	return a, nil
-}
-
-func (h *Handlers) getAllAirportsService() (int, error) {
-	total, err := h.core.airports.GetSum(context.Background())
-	pageSize := 30
-	lastPage := int(math.Ceil(float64(total) / float64(pageSize)))
-	if err != nil {
-		return 0, err
-	}
-	return lastPage, nil
-}
-
-func (h *Handlers) getAirportDetails(_ http.ResponseWriter, r *http.Request) (models.Airport, error) {
+func (h *Handler) getAirportDetails(_ http.ResponseWriter, r *http.Request) (models.Airport, error) {
 	vars := mux.Vars(r)
 	idStr, ok := vars["airport_id"]
 	if !ok {
@@ -71,7 +48,7 @@ func (h *Handlers) getAirportDetails(_ http.ResponseWriter, r *http.Request) (mo
 		return models.Airport{}, err
 	}
 
-	ap, err := h.core.airports.GetAirportByID(context.Background(), id)
+	ap, err := h.service.GetAirportByID(context.Background(), id)
 	if err != nil {
 		HandleError(err, "Error fetching airport details")
 		return models.Airport{}, err
@@ -80,7 +57,7 @@ func (h *Handlers) getAirportDetails(_ http.ResponseWriter, r *http.Request) (mo
 	return ap, nil
 }
 
-func (h *Handlers) getAirportByName(_ http.ResponseWriter, r *http.Request) (int, []models.Airport, error) {
+func (h *Handler) getAirportByName(_ http.ResponseWriter, r *http.Request) (int, []models.Airport, error) {
 	param := r.FormValue("search")
 	pageSize := 25
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
@@ -90,14 +67,14 @@ func (h *Handlers) getAirportByName(_ http.ResponseWriter, r *http.Request) (int
 		// Handle error or set a default page number
 		page = 1
 	}
-	ap, err := h.core.airports.GetAirportByName(context.Background(), param, page, pageSize, orderBy, sortBy)
+	ap, err := h.service.GetAirportByName(context.Background(), param, page, pageSize, orderBy, sortBy)
 	if err != nil {
 		return 0, nil, err
 	}
 	return page, ap, err
 }
 
-func (h *Handlers) renderAirportTable(w http.ResponseWriter, r *http.Request) (templ.Component, error) {
+func (h *Handler) renderAirportTable(w http.ResponseWriter, r *http.Request) (templ.Component, error) {
 	var ap = make([]models.Airport, 0)
 	var page int
 	var sortAux string
@@ -137,7 +114,7 @@ func (h *Handlers) renderAirportTable(w http.ResponseWriter, r *http.Request) (t
 		return nil, nil
 	}
 
-	lastPage, err := h.getAllAirportsService()
+	lastPage, err := h.service.GetAllAirports()
 	if err != nil {
 		HandleError(err, "Error fetching airports")
 		return nil, err
@@ -158,7 +135,7 @@ func (h *Handlers) renderAirportTable(w http.ResponseWriter, r *http.Request) (t
 	return airportTable, nil
 }
 
-func (h *Handlers) renderSidebar() []models.SidebarItem {
+func (h *Handler) renderSidebar() []models.SidebarItem {
 	sidebar := []models.SidebarItem{
 		{Path: "/", Label: "Home", Icon: svg2.HomeIcon()},
 		{Path: "/airports", Label: "Airports", Icon: svg2.BuildingOfficeIcon()},
@@ -169,9 +146,9 @@ func (h *Handlers) renderSidebar() []models.SidebarItem {
 	return sidebar
 }
 
-func (h *Handlers) airportPage(w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) AirportPage(w http.ResponseWriter, r *http.Request) error {
 	at, err := h.renderAirportTable(w, r)
-	al, err := h.getAirportsLocationService()
+	al, err := h.service.GetAirportsLocation()
 
 	sidebar := h.renderSidebar()
 	if err != nil {
@@ -182,8 +159,8 @@ func (h *Handlers) airportPage(w http.ResponseWriter, r *http.Request) error {
 	return h.CreateLayout(w, r, "Airport Page", a).Render(context.Background(), w)
 }
 
-func (h *Handlers) airportLocationPage(w http.ResponseWriter, r *http.Request) error {
-	al, err := h.getAirportsLocationService()
+func (h *Handler) AirportLocationPage(w http.ResponseWriter, r *http.Request) error {
+	al, err := h.service.GetAirportsLocation()
 	sidebar := h.renderSidebar()
 	if err != nil {
 		HandleError(err, "Error fetching airport location table")
@@ -193,7 +170,7 @@ func (h *Handlers) airportLocationPage(w http.ResponseWriter, r *http.Request) e
 	return h.CreateLayout(w, r, "Airport Locations Page", a).Render(context.Background(), w)
 }
 
-func (h *Handlers) airportDetailsPage(w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) AirportDetailsPage(w http.ResponseWriter, r *http.Request) error {
 	ad, err := h.getAirportDetails(w, r)
 	sidebar := h.renderSidebar()
 	if err != nil {

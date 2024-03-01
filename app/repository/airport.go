@@ -1,4 +1,4 @@
-package airport
+package repository
 
 import (
 	"context"
@@ -7,20 +7,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type RepositoryAirport struct {
+type AirportRepository struct {
 	pgpool *pgxpool.Pool
 }
 
-func NewAirports(
-	pgpool *pgxpool.Pool,
-
-) *RepositoryAirport {
-	return &RepositoryAirport{
-		pgpool: pgpool,
-	}
+func NewAirportRepository(db *pgxpool.Pool) *AirportRepository {
+	return &AirportRepository{pgpool: db}
 }
 
-func (r *RepositoryAirport) getAirportData(ctx context.Context, query string,
+func (r *AirportRepository) getAirportData(ctx context.Context, query string,
 	args ...interface{}) ([]models.Airport, error) {
 	var al []models.Airport
 
@@ -52,7 +47,7 @@ func (r *RepositoryAirport) getAirportData(ctx context.Context, query string,
 	return al, nil
 }
 
-func (r *RepositoryAirport) GetAirports(ctx context.Context,
+func (r *AirportRepository) GetAirports(ctx context.Context,
 	page, pageSize int, orderBy string, sortBy string) ([]models.Airport, error) {
 	query := `SELECT   id,
 			         gmt,
@@ -135,7 +130,7 @@ func (r *RepositoryAirport) GetAirports(ctx context.Context,
 	return r.getAirportData(ctx, query, orderBy, sortBy, offset, pageSize)
 }
 
-func (r *RepositoryAirport) GetSum(ctx context.Context) (int, error) {
+func (r *AirportRepository) GetSum(ctx context.Context) (int, error) {
 	var count int
 	row := r.pgpool.QueryRow(ctx, `SELECT Count(id)
 										FROM   airport
@@ -147,7 +142,7 @@ func (r *RepositoryAirport) GetSum(ctx context.Context) (int, error) {
 	return count, nil
 }
 
-func (r *RepositoryAirport) GetAirportsLocation(ctx context.Context) ([]models.Airport, error) {
+func (r *AirportRepository) GetAirportsLocation(ctx context.Context) ([]models.Airport, error) {
 	var airport []models.Airport
 
 	rows, err := r.pgpool.Query(ctx, `SELECT a.id,
@@ -192,7 +187,7 @@ func (r *RepositoryAirport) GetAirportsLocation(ctx context.Context) ([]models.A
 	return airport, nil
 }
 
-func (r *RepositoryAirport) GetAirportByName(ctx context.Context, name string,
+func (r *AirportRepository) GetAirportByName(ctx context.Context, name string,
 	page, pageSize int, orderBy string, sortBy string) ([]models.Airport, error) {
 	query := `SELECT   id,
 				         gmt,
@@ -276,7 +271,7 @@ func (r *RepositoryAirport) GetAirportByName(ctx context.Context, name string,
 	return r.getAirportData(ctx, query, name, orderBy, sortBy, offset, pageSize)
 }
 
-func (r *RepositoryAirport) GetAirportByID(ctx context.Context, id int) (models.Airport, error) {
+func (r *AirportRepository) GetAirportByID(ctx context.Context, id int) (models.Airport, error) {
 	var ap models.Airport
 	query := `
 		select distinct on(airport_id)

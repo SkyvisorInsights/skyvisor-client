@@ -1,19 +1,18 @@
-package app
+package handlers
 
 import (
-	"context"
 	"errors"
-	"math"
 	"net/http"
 	"strconv"
+
+	"context"
 
 	"github.com/FACorreiaa/Aviation-tracker/app/models"
 	svg2 "github.com/FACorreiaa/Aviation-tracker/app/svg"
 	"github.com/FACorreiaa/Aviation-tracker/app/view/components"
+	"github.com/FACorreiaa/Aviation-tracker/app/view/flights"
 	"github.com/a-h/templ"
 	"github.com/gorilla/mux"
-
-	"github.com/FACorreiaa/Aviation-tracker/app/view/flights"
 )
 
 // https://openlayers.org/en/latest/examples/feature-move-animation.html future feature
@@ -22,7 +21,7 @@ import (
 
 // need to change sql query later
 
-func (h *Handlers) renderLiveLocationsSidebar() []models.SidebarItem {
+func (h *Handler) renderLiveLocationsSidebar() []models.SidebarItem {
 	sidebar := []models.SidebarItem{
 		{Path: "/", Label: "Home", Icon: svg2.HomeIcon()},
 		{
@@ -59,7 +58,7 @@ func (h *Handlers) renderLiveLocationsSidebar() []models.SidebarItem {
 	return sidebar
 }
 
-func (h *Handlers) getFlights(_ http.ResponseWriter, r *http.Request) (int, []models.LiveFlights, error) {
+func (h *Handler) getFlights(_ http.ResponseWriter, r *http.Request) (int, []models.LiveFlights, error) {
 	pageSize := 15
 	vars := mux.Vars(r)
 	flightStatus := vars["flight_status"]
@@ -76,9 +75,9 @@ func (h *Handlers) getFlights(_ http.ResponseWriter, r *http.Request) (int, []mo
 	var lf []models.LiveFlights
 
 	if flightStatus == "" {
-		lf, err = h.core.flights.GetAllFlights(context.Background(), page, pageSize, orderBy, sortBy, param)
+		lf, err = h.service.GetAllFlights(context.Background(), page, pageSize, orderBy, sortBy, param)
 	} else {
-		lf, err = h.core.flights.GetAllFlightsByStatus(context.Background(),
+		lf, err = h.service.GetAllFlightsByStatus(context.Background(),
 			page, pageSize, orderBy, sortBy, param, flightStatus)
 	}
 
@@ -89,17 +88,7 @@ func (h *Handlers) getFlights(_ http.ResponseWriter, r *http.Request) (int, []mo
 	return page, lf, nil
 }
 
-func (h *Handlers) getAllFlightsServiceService() (int, error) {
-	total, err := h.core.flights.GetAllFlightsSum(context.Background())
-	pageSize := 15
-	lastPage := int(math.Ceil(float64(total) / float64(pageSize)))
-	if err != nil {
-		return 0, err
-	}
-	return lastPage, nil
-}
-
-func (h *Handlers) renderFlightsTable(w http.ResponseWriter,
+func (h *Handler) renderFlightsTable(w http.ResponseWriter,
 	r *http.Request) (templ.Component, error) {
 
 	var sortAux string
@@ -146,7 +135,7 @@ func (h *Handlers) renderFlightsTable(w http.ResponseWriter,
 		prevPage = 1
 	}
 
-	lastPage, err := h.getAllFlightsServiceService()
+	lastPage, err := h.service.GetAllFlightsSum()
 	if err != nil {
 		HandleError(err, "Error fetching total flights")
 		return nil, err
@@ -167,7 +156,7 @@ func (h *Handlers) renderFlightsTable(w http.ResponseWriter,
 	return flightsTable, nil
 }
 
-func (h *Handlers) getFlightsDetails(_ http.ResponseWriter, r *http.Request) (models.LiveFlights, error) {
+func (h *Handler) getFlightsDetails(_ http.ResponseWriter, r *http.Request) (models.LiveFlights, error) {
 	vars := mux.Vars(r)
 	flightNumber, ok := vars["flight_number"]
 	if !ok {
@@ -176,7 +165,7 @@ func (h *Handlers) getFlightsDetails(_ http.ResponseWriter, r *http.Request) (mo
 		return models.LiveFlights{}, err
 	}
 
-	lf, err := h.core.flights.GetFlightByID(context.Background(), flightNumber)
+	lf, err := h.service.GetFlightByID(context.Background(), flightNumber)
 	if err != nil {
 		HandleError(err, "Error flights details")
 		return models.LiveFlights{}, err
@@ -185,17 +174,7 @@ func (h *Handlers) getFlightsDetails(_ http.ResponseWriter, r *http.Request) (mo
 	return lf, nil
 }
 
-func (h *Handlers) getAllFlightsService() ([]models.LiveFlights, error) {
-	lf, err := h.core.flights.GetAllFlightsPreview(context.Background())
-	if err != nil {
-		HandleError(err, "Error flights details")
-		return nil, err
-	}
-
-	return lf, nil
-}
-
-func (h *Handlers) allFlightsPage(w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) AllFlightsPage(w http.ResponseWriter, r *http.Request) error {
 	table, err := h.renderFlightsTable(w, r)
 	if err != nil {
 		HandleError(err, "Error fetching flights table")
@@ -207,7 +186,7 @@ func (h *Handlers) allFlightsPage(w http.ResponseWriter, r *http.Request) error 
 	return h.CreateLayout(w, r, "Live Flights", f).Render(context.Background(), w)
 }
 
-func (h *Handlers) detailedFlightsPage(w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) DetailedFlightsPage(w http.ResponseWriter, r *http.Request) error {
 	s := h.renderLiveLocationsSidebar()
 	fd, err := h.getFlightsDetails(w, r)
 
@@ -220,9 +199,9 @@ func (h *Handlers) detailedFlightsPage(w http.ResponseWriter, r *http.Request) e
 	return h.CreateLayout(w, r, "Live Flights", f).Render(context.Background(), w)
 }
 
-func (h *Handlers) flightsPreview(w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) FlightsPreview(w http.ResponseWriter, r *http.Request) error {
 	s := h.renderLiveLocationsSidebar()
-	fd, err := h.getAllFlightsService()
+	fd, err := h.service.GetAllFlightsPreview()
 
 	if err != nil {
 		HandleError(err, "Error fetching flights details page")
