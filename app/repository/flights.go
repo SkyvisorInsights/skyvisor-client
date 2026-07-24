@@ -281,11 +281,11 @@ func (r *FlightsRepository) GetFlightByID(ctx context.Context, flightNumber stri
 			    airline al on f.codeshared_airline_iata = al.iata_code
 			WHERE
 			    ad.latitude IS NOT NULL
-			  AND ad.longitude IS NOT NULL AND
-				Trim(Upper(f.flight_number)) != '' AND
-							Trim(Upper(f.codeshared_airline_name)) != '' AND
-							Trim(Upper(f.codeshared_airline_name)) != 'N/A'
-			  AND flight_number = $1;`
+			  AND ad.longitude IS NOT NULL
+			  AND Trim(Upper(f.flight_number)) != ''
+			  AND Trim(Upper(f.flight_iata)) = Trim(Upper($1))
+			ORDER BY f.flight_date DESC NULLS LAST
+			LIMIT 1;`
 
 	err := r.pgpool.QueryRow(ctx, query, flightNumber).Scan(
 		&f.Flight.Number,

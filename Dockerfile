@@ -11,7 +11,10 @@ FROM golang:1.26.5-alpine AS build
 WORKDIR /src
 RUN apk add --no-cache ca-certificates git
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=secret,id=git_token,required=true \
+    git config --global url."https://x-access-token:$(cat /run/secrets/git_token)@github.com/".insteadOf "https://github.com/" \
+    && GOPRIVATE=github.com/FACorreiaa/* go mod download \
+    && git config --global --unset-all url."https://x-access-token:$(cat /run/secrets/git_token)@github.com/".insteadOf
 COPY . .
 COPY --from=assets /src/app/static ./app/static
 RUN go run github.com/a-h/templ/cmd/templ@v0.3.1020 generate
