@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
 
+env:
+  GOPRIVATE: github.com/FACorreiaa/*
+
 permissions:
   contents: read
 
@@ -18,6 +21,8 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Grant access to private Go modules
+        run: git config --global url."https://x-access-token:${{ secrets.INFRA_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.14

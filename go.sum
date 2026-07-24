@@ -1,5 +1,7 @@
 github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d h1:0Yg0JAKFpJ1OsJ6kC/Rzqrm5lrHz+A6SeJq/IgAumjw=
 github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d/go.mod h1:S9c2rd6GI3yF4LQg14bKnnGQaD4f84dYVUIxfve+dQc=
+github.com/FACorreiaa/skyvisor-go-shared v0.1.0 h1:jWIhTRdX3HZN1swURM2iQCaX0uyCzT70ZjoDMTLjfBQ=
+github.com/FACorreiaa/skyvisor-go-shared v0.1.0/go.mod h1:5JQIAGd1rLbY+lf4DfKPVVxdqQ+Q+oZz+TghgoOkZxI=
 github.com/Oudwins/tailwind-merge-go v0.2.1 h1:jxRaEqGtwwwF48UuFIQ8g8XT7YSualNuGzCvQ89nPFE=
 github.com/Oudwins/tailwind-merge-go v0.2.1/go.mod h1:kkZodgOPvZQ8f7SIrlWkG/w1g9JTbtnptnePIh3V72U=
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=

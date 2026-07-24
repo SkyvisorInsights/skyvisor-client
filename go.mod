@@ -64,7 +64,5 @@ require (
 
 require (
 	github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d
-	github.com/FACorreiaa/skyvisor-go-shared v0.0.0
+	github.com/FACorreiaa/skyvisor-go-shared v0.1.0
 )
-
-replace github.com/FACorreiaa/skyvisor-go-shared => ../skyvisor-go-shared

@@ -247,12 +247,35 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		csrf.Path("/"),
 		csrf.SameSite(csrf.SameSiteLaxMode),
 		csrf.FieldName("csrf_token"),
-		csrf.ErrorHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			http.Error(w, "The form expired. Refresh the page and try again.", http.StatusForbidden)
+		// gorilla/csrf >= 1.7.3 enforces Origin/Referer checks that Safari
+		// trips over (null or absent Origin on same-site posts). Trust our own
+		// hosts explicitly.
+		csrf.TrustedOrigins([]string{
+			"127.0.0.1:6968", "127.0.0.1:6969", "localhost:6968", "localhost:6969",
+			"skyvisor.app", "www.skyvisor.app", "staging.skyvisor.app",
+		}),
+		// Respond with HTML, never text/plain: Safari downloads text/plain
+		// responses to top-level form POSTs instead of rendering them.
+		csrf.ErrorHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			slog.WarnContext(r.Context(), "csrf rejection",
+				"path", r.URL.Path, "reason", csrf.FailureReason(r),
+				"origin", r.Header.Get("Origin"), "referer", r.Header.Get("Referer"))
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.WriteHeader(http.StatusForbidden)
+			_, _ = w.Write([]byte(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Form expired - SkyVisor Insight</title></head><body style="font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100dvh;margin:0;background:#0b1220;color:#e2e8f0"><main style="text-align:center;padding:2rem"><h1 style="font-size:1.25rem;margin:0 0 .5rem">That form expired</h1><p style="color:#94a3b8;margin:0 0 1.25rem">Go back and try again; the page will issue a fresh token.</p><a href="/" style="color:#60a5fa">Return to SkyVisor</a></main></body></html>`))
 		})),
 	)
 
-	return csrfMiddleware(r)
+	handlerChain := csrfMiddleware(r)
+	if !cookieSecure {
+		// Local development runs plain HTTP; skip the Referer origin
+		// allow-list check that otherwise 403s Safari.
+		plain := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			handlerChain.ServeHTTP(w, csrf.PlaintextHTTPRequest(req))
+		})
+		return plain
+	}
+	return handlerChain
 }
 
 func securityHeaders(next http.Handler) http.Handler {
