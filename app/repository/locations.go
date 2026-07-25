@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

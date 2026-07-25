@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	dashboardview "github.com/FACorreiaa/Aviation-tracker/app/view/dashboard"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	dashboardview "github.com/SkyvisorInsights/Aviation-tracker/app/view/dashboard"
 )
 
 // DashboardPage is the API-backed signed-in command center.

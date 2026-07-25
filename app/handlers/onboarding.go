@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/onboarding"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/onboarding"
 	"github.com/gorilla/csrf"
 )
 

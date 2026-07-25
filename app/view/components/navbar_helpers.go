@@ -3,7 +3,7 @@ package components
 import (
 	"strings"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 func navActive(item models.NavItem, activePath string) bool {

@@ -5,10 +5,11 @@ package components
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
-
-import "github.com/FACorreiaa/Aviation-tracker/app/models"
+import (
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
+)
 
 func NavbarComponent(nav []models.NavItem, user *models.UserSession, activeNav, csrfToken string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {

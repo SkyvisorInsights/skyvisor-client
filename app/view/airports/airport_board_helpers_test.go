@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 )
 
 func TestAirportBoardOperationalCounts(t *testing.T) {

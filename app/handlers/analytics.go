@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	analyticsview "github.com/FACorreiaa/Aviation-tracker/app/view/analytics"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	analyticsview "github.com/SkyvisorInsights/Aviation-tracker/app/view/analytics"
 )
 
 // AnalyticsPage renders performance analytics via skyvisor-api (Phase 6).

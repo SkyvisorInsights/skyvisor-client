@@ -8,7 +8,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/api/structs"
+	"github.com/SkyvisorInsights/Aviation-tracker/api/structs"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/robfig/cron/v3"

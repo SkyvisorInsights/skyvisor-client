@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/api/structs"
+	"github.com/SkyvisorInsights/Aviation-tracker/api/structs"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

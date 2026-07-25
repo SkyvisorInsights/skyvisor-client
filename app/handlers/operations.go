@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	operationsview "github.com/FACorreiaa/Aviation-tracker/app/view/operations"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	operationsview "github.com/SkyvisorInsights/Aviation-tracker/app/view/operations"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 )

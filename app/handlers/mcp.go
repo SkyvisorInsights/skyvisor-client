@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	mcpdocs "github.com/FACorreiaa/Aviation-tracker/app/view/mcpdocs"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	mcpdocs "github.com/SkyvisorInsights/Aviation-tracker/app/view/mcpdocs"
 )
 
 func (h *Handler) MCPPlaygroundPage(w http.ResponseWriter, r *http.Request) error {

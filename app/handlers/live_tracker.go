@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/flights"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/flights"
 )
 
 // LiveTrackerPage lists provider-backed flights via skyvisor-api (Phase 3).

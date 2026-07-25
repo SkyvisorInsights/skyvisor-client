@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 func HandleError(err error, message string) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/auth"
-	"github.com/FACorreiaa/Aviation-tracker/app/repository"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/repository"
 	"golang.org/x/oauth2"
 )
 

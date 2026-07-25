@@ -7,23 +7,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 type MapAttrs struct {
-	Latitude      float64
-	Longitude     float64
-	Zoom          float64
-	DepLat        float64
-	DepLon        float64
-	ArrLat        float64
-	ArrLon        float64
-	LiveLat       float64
-	LiveLon       float64
-	FlightNumber  string
-	HasRoute      bool
-	HasLive       bool
-	ProgressPct   int
+	Latitude     float64
+	Longitude    float64
+	Zoom         float64
+	DepLat       float64
+	DepLon       float64
+	ArrLat       float64
+	ArrLon       float64
+	LiveLat      float64
+	LiveLon      float64
+	FlightNumber string
+	HasRoute     bool
+	HasLive      bool
+	ProgressPct  int
 }
 
 func enrichFlightCoords(flight *models.LiveFlights) {

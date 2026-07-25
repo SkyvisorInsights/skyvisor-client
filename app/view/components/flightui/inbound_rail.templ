@@ -1,6 +1,6 @@
 package flightui
 
-import "github.com/FACorreiaa/Aviation-tracker/app/models"
+import "github.com/SkyvisorInsights/Aviation-tracker/app/models"
 
 templ InboundRail(flight *models.LiveFlights) {
 	if flight != nil && flight.Inbound != nil && (flight.Inbound.LateRisk || flight.Inbound.Message != "") {

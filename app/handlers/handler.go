@@ -6,12 +6,12 @@ import (
 
 	"context"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/auth"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	"github.com/FACorreiaa/Aviation-tracker/app/services"
-	svg2 "github.com/FACorreiaa/Aviation-tracker/app/static/svg"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/components"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/pages"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/services"
+	svg2 "github.com/SkyvisorInsights/Aviation-tracker/app/static/svg"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/pages"
 	"github.com/a-h/templ"
 	"github.com/go-playground/form/v4"
 	"github.com/go-playground/locales/en"

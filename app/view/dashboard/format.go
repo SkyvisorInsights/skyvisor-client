@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 )
 
 func count(value int) string { return strconv.Itoa(value) }

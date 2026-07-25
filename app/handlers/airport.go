@@ -7,10 +7,10 @@ import (
 
 	"context"
 
-	httperror "github.com/FACorreiaa/Aviation-tracker/app/errors"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	svg2 "github.com/FACorreiaa/Aviation-tracker/app/static/svg"
-	airport "github.com/FACorreiaa/Aviation-tracker/app/view/airports"
+	httperror "github.com/SkyvisorInsights/Aviation-tracker/app/errors"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	svg2 "github.com/SkyvisorInsights/Aviation-tracker/app/static/svg"
+	airport "github.com/SkyvisorInsights/Aviation-tracker/app/view/airports"
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 )

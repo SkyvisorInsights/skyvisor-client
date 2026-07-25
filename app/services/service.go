@@ -3,9 +3,9 @@ package services
 import (
 	"log"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	"github.com/FACorreiaa/Aviation-tracker/app/auth"
-	"github.com/FACorreiaa/Aviation-tracker/app/repository"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/repository"
 )
 
 type Service struct {

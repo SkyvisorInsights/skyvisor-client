@@ -9,13 +9,12 @@ package input
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
-
 import (
-	"github.com/FACorreiaa/Aviation-tracker/app/components/ui/button"
-	"github.com/FACorreiaa/Aviation-tracker/app/components/ui/icon"
-	"github.com/FACorreiaa/Aviation-tracker/app/utils"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/button"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/icon"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/utils"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
 )
 
 type Type string
