@@ -38,6 +38,9 @@ jobs:
           path: .skyvisor-api
           sparse-checkout: api/openapi.yaml
           sparse-checkout-cone-mode: false
+          # skyvisor-api is private; the default GITHUB_TOKEN is scoped to this
+          # repository only.
+          token: ${{ secrets.INFRA_TOKEN }}
       - name: Check generated API client
         run: |
           make api-client OPENAPI_SPEC=.skyvisor-api/api/openapi.yaml
