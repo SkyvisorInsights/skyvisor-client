@@ -5,11 +5,10 @@ package components
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import (
-	"github.com/FACorreiaa/Thinking-orbs-go/components/orb"
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
-)
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
+
+import "github.com/FACorreiaa/Thinking-orbs-go/components/orb"
 
 // HTMXLoadingOrb is a 20px thinking orb shown while an HTMX request is in flight.
 func HTMXLoadingOrb(id string, state orb.State, label string) templ.Component {
