@@ -5,13 +5,14 @@ package trips
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
+
 import (
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/badge"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/button"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/card"
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
 )
 
 func TripsPage(trips []apiclient.Trip, message string, assistantAnswer string, whatIfSummary string, whatIfAnswer string, csrfToken string) templ.Component {

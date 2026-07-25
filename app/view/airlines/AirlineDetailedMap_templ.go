@@ -5,11 +5,10 @@ package airline
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import (
-	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
-	"github.com/a-h/templ"
-	templruntime "github.com/a-h/templ/runtime"
-)
+import "github.com/a-h/templ"
+import templruntime "github.com/a-h/templ/runtime"
+
+import "github.com/SkyvisorInsights/Aviation-tracker/app/models"
 
 func detailedMapContainer(data models.Airline) templ.ComponentScript {
 	return templ.ComponentScript{
