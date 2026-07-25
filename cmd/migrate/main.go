@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/config"
-	"github.com/FACorreiaa/Aviation-tracker/db"
+	"github.com/SkyvisorInsights/Aviation-tracker/config"
+	"github.com/SkyvisorInsights/Aviation-tracker/db"
 )
 
 func run(ctx context.Context) error {

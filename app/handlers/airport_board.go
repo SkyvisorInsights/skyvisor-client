@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	airportview "github.com/FACorreiaa/Aviation-tracker/app/view/airports"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	airportview "github.com/SkyvisorInsights/Aviation-tracker/app/view/airports"
 	"github.com/go-chi/chi/v5"
 )
 

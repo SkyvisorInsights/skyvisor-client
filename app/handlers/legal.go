@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/view/legal"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/legal"
 )
 
 func (h *Handler) TermsPage(w http.ResponseWriter, r *http.Request) error {

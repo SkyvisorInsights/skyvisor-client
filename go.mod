@@ -1,4 +1,4 @@
-module github.com/FACorreiaa/Aviation-tracker
+module github.com/SkyvisorInsights/Aviation-tracker
 
 go 1.26.5
 
@@ -64,5 +64,5 @@ require (
 
 require (
 	github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d
-	github.com/FACorreiaa/skyvisor-go-shared v0.1.0
+	github.com/SkyvisorInsights/skyvisor-go-shared v0.2.0
 )

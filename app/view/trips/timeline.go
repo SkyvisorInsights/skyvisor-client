@@ -4,7 +4,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 )
 
 // TimelineEntry is one flight segment placed on the chronological timeline.

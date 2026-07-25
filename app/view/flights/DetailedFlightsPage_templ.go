@@ -5,14 +5,15 @@ package flights
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
-
 import (
 	"fmt"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	svg2 "github.com/FACorreiaa/Aviation-tracker/app/static/svg"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/components"
+
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
+
+	svg2 "github.com/SkyvisorInsights/Aviation-tracker/app/static/svg"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components"
 )
 
 func toggleDropdown(id string) templ.ComponentScript {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 )
 
 func connectionDot(available bool) string {

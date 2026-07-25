@@ -5,7 +5,7 @@ import (
 
 	"context"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 func (h *Service) GetAirports(ctx context.Context,

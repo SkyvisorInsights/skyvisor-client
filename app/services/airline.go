@@ -4,7 +4,7 @@ import (
 	"context"
 	"math"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 func (h *Service) GetAirlinesLocation() ([]models.Airline, error) {

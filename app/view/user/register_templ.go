@@ -5,15 +5,14 @@ package user
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
-
 import (
-	"github.com/FACorreiaa/Aviation-tracker/app/components/ui/button"
-	"github.com/FACorreiaa/Aviation-tracker/app/components/ui/card"
-	"github.com/FACorreiaa/Aviation-tracker/app/components/ui/input"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/components"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/button"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/card"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/input"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
 )
 
 func RegisterPage(register models.RegisterPage, csrfToken string) templ.Component {

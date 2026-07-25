@@ -3,7 +3,7 @@ package repository
 import (
 	"testing"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/auth"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
 )
 
 func TestUsernameCandidate(t *testing.T) {

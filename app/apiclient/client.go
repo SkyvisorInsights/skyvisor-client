@@ -6,8 +6,8 @@ import (
 	"context"
 	"io"
 
-	shared "github.com/FACorreiaa/skyvisor-go-shared/apiclient"
-	"github.com/FACorreiaa/skyvisor-go-shared/domain"
+	shared "github.com/SkyvisorInsights/skyvisor-go-shared/apiclient"
+	"github.com/SkyvisorInsights/skyvisor-go-shared/domain"
 )
 
 var (

@@ -3,7 +3,7 @@ package trips
 import (
 	"fmt"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 	"github.com/a-h/templ"
 )
 

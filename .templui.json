@@ -1,7 +1,7 @@
 {
   "componentsDir": "app/components/ui",
   "utilsDir": "app/utils",
-  "moduleName": "github.com/FACorreiaa/Aviation-tracker",
+  "moduleName": "github.com/SkyvisorInsights/Aviation-tracker",
   "jsDir": "app/static/templui/js",
   "jsPublicPath": "/static/templui/js"
 }

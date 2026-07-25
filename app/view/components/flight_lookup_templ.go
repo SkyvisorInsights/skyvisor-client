@@ -5,17 +5,16 @@ package components
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import "github.com/a-h/templ"
-import templruntime "github.com/a-h/templ/runtime"
-
 import (
 	"fmt"
 	"net/url"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/components/ui/button"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/components/flightui"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/components/ui/button"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components/flightui"
 	"github.com/FACorreiaa/Thinking-orbs-go/components/orb"
+	"github.com/a-h/templ"
+	templruntime "github.com/a-h/templ/runtime"
 )
 
 func FlightLookupResultContainer(result templ.Component) templ.Component {

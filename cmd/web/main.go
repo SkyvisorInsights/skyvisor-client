@@ -12,12 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app"
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	"github.com/FACorreiaa/Aviation-tracker/app/auth"
-	"github.com/FACorreiaa/Aviation-tracker/app/telemetry"
-	"github.com/FACorreiaa/Aviation-tracker/config"
-	"github.com/FACorreiaa/Aviation-tracker/db"
+	"github.com/SkyvisorInsights/Aviation-tracker/app"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/telemetry"
+	"github.com/SkyvisorInsights/Aviation-tracker/config"
+	"github.com/SkyvisorInsights/Aviation-tracker/db"
 )
 
 func run(ctx context.Context) error {

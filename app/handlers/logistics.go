@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	logisticsview "github.com/FACorreiaa/Aviation-tracker/app/view/logistics"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	logisticsview "github.com/SkyvisorInsights/Aviation-tracker/app/view/logistics"
 	"github.com/gorilla/csrf"
 )
 

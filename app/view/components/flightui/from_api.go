@@ -1,8 +1,8 @@
 package flightui
 
 import (
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 // LiveFlightFromAPI maps a provider flight DTO into the web track model.

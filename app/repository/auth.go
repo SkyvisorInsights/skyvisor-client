@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/auth"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"

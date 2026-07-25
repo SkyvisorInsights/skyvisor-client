@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FACorreiaa/Aviation-tracker/app/apiclient"
-	"github.com/FACorreiaa/Aviation-tracker/app/models"
-	"github.com/FACorreiaa/Aviation-tracker/app/view/user"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 )
