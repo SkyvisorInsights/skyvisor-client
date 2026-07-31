@@ -34,28 +34,55 @@ type AttentionRow struct {
 }
 
 templ Page(v View) {
-	<section
-		id="globe-view"
-		class="relative flex h-full w-full flex-col overflow-hidden bg-[var(--map-ocean)]"
-		data-globe-root
-		data-live-refresh-url="/globe?partial=globe"
-		data-live-refresh-target="#globe-view"
-	>
-		@bootstrap(v)
-		<div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
-			@GlobeSVG(v)
+	<section id="globe-view" class="relative flex h-full w-full flex-col overflow-hidden bg-[var(--map-ocean)]" data-globe-root>
+		// The WebGL globe and the server-rendered one occupy the same box. The
+		// SVG renders first and is what remains without JavaScript or WebGL; the
+		// canvas fades in only once it has drawn a frame.
+		//
+		// Both sit outside the refreshed region: live updates swap the panels
+		// only, so a data tick never tears down and rebuilds a WebGL context.
+		<div class="absolute inset-0 z-0">
+			<div
+				id="globe-canvas"
+				data-skyvisor-map
+				data-map-mode="globe"
+				data-globe-canvas
+				data-globe-bootstrap="#globe-bootstrap"
+				data-map-fallback="#globe-fallback"
+				data-map-gestures="direct"
+				data-latitude="18"
+				data-longitude={ fmt.Sprintf("%.4f", v.Ortho.CenterLon) }
+				data-zoom="1.35"
+				class="absolute inset-0"
+				aria-hidden="true"
+			></div>
+			<div id="globe-fallback" class="pointer-events-none absolute inset-0 flex items-center justify-center">
+				@GlobeSVG(v)
+			</div>
 		</div>
 		<div class="relative z-10 flex min-h-0 flex-1">
 			@IconRail()
-			<div class="flex min-h-0 flex-1 flex-col">
-				@header(v)
-				<div class="flex min-h-0 flex-1 items-start justify-end px-4 pb-4 sm:px-6">
-					@StatsRail(v)
-				</div>
-				@Activities(v)
-			</div>
+			@Panels(v)
 		</div>
 	</section>
+}
+
+// Panels is the refreshable half of the page: everything that changes when the
+// data does, including the bootstrap envelope the map re-reads.
+templ Panels(v View) {
+	<div
+		id="globe-panels"
+		class="flex min-h-0 flex-1 flex-col"
+		data-live-refresh-url="/globe?partial=globe-panels"
+		data-live-refresh-target="#globe-panels"
+	>
+		@bootstrap(v)
+		@header(v)
+		<div class="flex min-h-0 flex-1 items-start justify-end px-4 pb-4 sm:px-6">
+			@StatsRail(v)
+		</div>
+		@Activities(v)
+	</div>
 }
 
 // bootstrap embeds the envelope so the map bundle can hydrate without a second

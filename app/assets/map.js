@@ -5,13 +5,26 @@
 // from every other page on the site.
 
 import maplibregl from 'maplibre-gl'
-import { initMaps, teardownMap, hasMap } from './map/registry.js'
+import { initMaps, refreshGlobe, teardownMap, hasMap } from './map/registry.js'
 import { initFleetFilmstrip } from './map/chrome/filmstrip.js'
+import { initGlobeFocus } from './map/chrome/focus.js'
 
 function init(root = document) {
   initMaps(root)
   initFleetFilmstrip(root)
+  initGlobeFocus(root)
+}
+
+// Called after an htmx swap replaced the globe panels. The canvas itself is
+// outside the swapped region, so the existing map is updated in place rather
+// than rebuilt — recreating a WebGL context on every data tick would be both
+// slow and visibly jarring.
+function refresh(root = document) {
+  const canvas = document.querySelector('[data-globe-canvas]')
+  if (!canvas || !canvas._skyvisorMap) return
+  refreshGlobe(canvas)
+  initGlobeFocus(root)
 }
 
 window.maplibregl = maplibregl
-window.SkyVisorMap = { init, initMaps, initFleetFilmstrip, teardownMap, hasMap }
+window.SkyVisorMap = { init, refresh, initMaps, initFleetFilmstrip, teardownMap, hasMap }

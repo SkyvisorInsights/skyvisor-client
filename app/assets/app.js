@@ -99,6 +99,10 @@ if (document.readyState === 'loading') {
 
 document.body.addEventListener('htmx:afterSwap', (event) => {
   boot(event.detail.target)
+  // A swap that carried a new globe envelope updates the existing map in place.
+  if (window.SkyVisorMap && document.getElementById('globe-bootstrap')) {
+    window.SkyVisorMap.refresh(event.detail.target)
+  }
 })
 
 document.body.addEventListener('htmx:beforeCleanupElement', (event) => {
