@@ -43,8 +43,14 @@ func (h *Handler) GlobePage(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	// Live refreshes swap the panels only, so the WebGL context behind them
+	// survives the update.
+	if globePartial(r) == "globe-panels" {
+		return globeview.Panels(view).Render(r.Context(), w)
+	}
+
 	page := globeview.Page(view)
-	if isGlobePartial(r) {
+	if globePartial(r) == "globe" {
 		return page.Render(r.Context(), w)
 	}
 	return h.CreateCanvasLayout(w, r, "Global view", page).Render(r.Context(), w)
@@ -73,12 +79,21 @@ func (h *Handler) GlobeData(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(view.Envelope)
 }
 
-func isGlobePartial(r *http.Request) bool {
-	if r.URL.Query().Get("partial") == "globe" {
-		return true
+// globePartial reports which fragment the caller wants, or "" for a full page.
+func globePartial(r *http.Request) string {
+	switch r.URL.Query().Get("partial") {
+	case "globe-panels":
+		return "globe-panels"
+	case "globe":
+		return "globe"
 	}
-	target := strings.TrimSpace(r.Header.Get("HX-Target"))
-	return target == "globe-view" || target == "#globe-view"
+	switch strings.TrimSpace(r.Header.Get("HX-Target")) {
+	case "globe-panels", "#globe-panels":
+		return "globe-panels"
+	case "globe-view", "#globe-view":
+		return "globe"
+	}
+	return ""
 }
 
 // parseWindowDays rejects malformed input rather than silently defaulting, so a
