@@ -56,6 +56,24 @@
   --input: oklch(0.89 0.012 250);
   --ring: oklch(0.62 0.17 255);
   --radius: 0.7rem;
+
+  /* Map palette.
+     The basemap needs colours the UI token set does not have (ocean, graticule,
+     label halo), so they live here alongside the rest rather than pretending
+     --muted is a coastline. Resolved to sRGB at runtime by map/palette.js,
+     since MapLibre cannot parse oklch() or read custom properties. */
+  --map-ocean: oklch(0.93 0.015 245);
+  --map-land: oklch(0.975 0.006 247);
+  --map-boundary: oklch(0.84 0.018 250);
+  --map-graticule: oklch(0.89 0.012 248);
+  --map-arc-ok: var(--primary);
+  --map-arc-watch: oklch(0.68 0.16 75);
+  --map-arc-risk: var(--destructive);
+  --map-hub: oklch(0.5 0.14 250);
+  --map-flight: oklch(0.42 0.16 255);
+  --map-label: var(--foreground);
+  --map-label-halo: oklch(1 0 0);
+  --map-atmosphere: oklch(0.72 0.11 250);
 }
 
 .dark {
@@ -78,6 +96,21 @@
   --border: oklch(0.3 0.025 255);
   --input: oklch(0.3 0.025 255);
   --ring: oklch(0.7 0.15 250);
+
+  /* Dark map palette. Deep navy ocean with land lifted just enough to read,
+     matching the dark shell rather than the daylight look of a satellite tile. */
+  --map-ocean: oklch(0.14 0.026 255);
+  --map-land: oklch(0.225 0.022 255);
+  --map-boundary: oklch(0.34 0.022 255);
+  --map-graticule: oklch(0.24 0.02 255);
+  --map-arc-ok: var(--primary);
+  --map-arc-watch: oklch(0.75 0.16 75);
+  --map-arc-risk: var(--destructive);
+  --map-hub: oklch(0.82 0.09 250);
+  --map-flight: oklch(0.97 0.01 250);
+  --map-label: var(--foreground);
+  --map-label-halo: oklch(0.14 0.026 255);
+  --map-atmosphere: oklch(0.55 0.16 250);
 }
 
 html { overflow-x: clip; scroll-behavior: smooth; }
