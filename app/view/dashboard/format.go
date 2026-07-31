@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 func count(value int) string { return strconv.Itoa(value) }
@@ -174,22 +175,75 @@ func fleetOriginIATA(w apiclient.OperationsWatch) string {
 	return parseRouteOrigin(w.Route)
 }
 
-func watchMarkersJSON(watches []apiclient.OperationsWatch) string {
-	if len(watches) == 0 {
+// watchMarkersJSON serialises pre-resolved fleet markers for the map.
+// Coordinates come from the handler, not from a table in the browser.
+func watchMarkersJSON(markers []models.FleetMarker) string {
+	if len(markers) == 0 {
 		return "[]"
 	}
-	parts := make([]string, 0, len(watches))
+	parts := make([]string, 0, len(markers))
+	for _, marker := range markers {
+		parts = append(parts, fmt.Sprintf(
+			`{"iata":%q,"flight":%q,"lon":%s,"lat":%s}`,
+			marker.IATA, marker.Flight,
+			strconv.FormatFloat(marker.Lon, 'f', -1, 64),
+			strconv.FormatFloat(marker.Lat, 'f', -1, 64),
+		))
+	}
+	return "[" + strings.Join(parts, ",") + "]"
+}
+
+func fleetMarkerFor(markers []models.FleetMarker, flightNumber string) (models.FleetMarker, bool) {
+	for _, marker := range markers {
+		if marker.Flight == flightNumber {
+			return marker, true
+		}
+	}
+	return models.FleetMarker{}, false
+}
+
+// fleetMarkerLon/Lat return "" when a watch has no resolvable origin, so the
+// filmstrip button simply does not fly the map rather than flying it to 0,0.
+func fleetMarkerLon(markers []models.FleetMarker, flightNumber string) string {
+	marker, ok := fleetMarkerFor(markers, flightNumber)
+	if !ok {
+		return ""
+	}
+	return strconv.FormatFloat(marker.Lon, 'f', -1, 64)
+}
+
+func fleetMarkerLat(markers []models.FleetMarker, flightNumber string) string {
+	marker, ok := fleetMarkerFor(markers, flightNumber)
+	if !ok {
+		return ""
+	}
+	return strconv.FormatFloat(marker.Lat, 'f', -1, 64)
+}
+
+// FleetMarkersFrom resolves each watch's origin airport to a position.
+// Watches whose origin is unknown are dropped rather than plotted at 0,0.
+func FleetMarkersFrom(watches []apiclient.OperationsWatch, lookup func(string) (float64, float64, bool)) []models.FleetMarker {
+	if len(watches) == 0 || lookup == nil {
+		return nil
+	}
+	markers := make([]models.FleetMarker, 0, len(watches))
 	for _, watch := range watches {
 		iata := parseRouteOrigin(watch.Route)
 		if iata == "" {
 			continue
 		}
-		parts = append(parts, fmt.Sprintf(`{"iata":%q,"flight":%q}`, iata, watch.FlightNumber))
+		lat, lon, ok := lookup(iata)
+		if !ok {
+			continue
+		}
+		markers = append(markers, models.FleetMarker{
+			IATA:   iata,
+			Flight: watch.FlightNumber,
+			Lat:    lat,
+			Lon:    lon,
+		})
 	}
-	if len(parts) == 0 {
-		return "[]"
-	}
-	return "[" + strings.Join(parts, ",") + "]"
+	return markers
 }
 
 func parseRouteOrigin(route string) string {

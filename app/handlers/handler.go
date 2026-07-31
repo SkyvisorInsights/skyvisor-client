@@ -11,6 +11,7 @@ import (
 	"github.com/SkyvisorInsights/Aviation-tracker/app/services"
 	svg2 "github.com/SkyvisorInsights/Aviation-tracker/app/static/svg"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components/flightui"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/view/pages"
 	"github.com/a-h/templ"
 	"github.com/go-playground/form/v4"
@@ -25,6 +26,12 @@ import (
 
 const ASC = "ASC"
 const DESC = "DESC"
+
+// coordLookup hands the view layer a plain function for IATA -> position so
+// templ helpers never touch the database themselves.
+func (h *Handler) coordLookup() flightui.CoordLookup {
+	return flightui.CoordLookup(h.service.CoordLookup())
+}
 
 type contextKey string
 
