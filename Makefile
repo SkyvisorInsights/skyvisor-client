@@ -1,6 +1,11 @@
-.PHONY: assets build dev generate api-client migrate infra-up infra-down test verify
+.PHONY: assets basemap build dev generate api-client migrate infra-up infra-down test verify
 
 OPENAPI_SPEC ?= ../skyvisor-api/api/openapi.yaml
+
+# Regenerates the Natural Earth basemap. Run only when the source data changes
+# (roughly yearly) — the output is committed. Requires ogr2ogr (GDAL).
+basemap:
+	./scripts/build-basemap.sh
 
 assets:
 	bun install --frozen-lockfile
