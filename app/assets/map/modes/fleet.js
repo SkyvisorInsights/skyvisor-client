@@ -1,5 +1,6 @@
-import { AIRPORT_COORDS } from '../coords.js'
-
+// Fleet markers are fully resolved server-side (see FleetMarkersFrom in
+// app/view/dashboard/format.go). Markers without a known origin are dropped
+// there, so anything arriving here already has a real position.
 export function fleetLayers(map, element) {
   let markers = []
   try {
@@ -7,17 +8,14 @@ export function fleetLayers(map, element) {
   } catch {
     markers = []
   }
+
   const features = markers
-    .map((marker) => {
-      const coord = AIRPORT_COORDS[marker.iata]
-      if (!coord) return null
-      return {
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: coord },
-        properties: { label: marker.flight || marker.iata },
-      }
-    })
-    .filter(Boolean)
+    .filter((marker) => Number.isFinite(marker.lon) && Number.isFinite(marker.lat))
+    .map((marker) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [marker.lon, marker.lat] },
+      properties: { label: marker.flight || marker.iata },
+    }))
 
   const data = { type: 'FeatureCollection', features }
   if (!map.getSource('fleet-markers')) {

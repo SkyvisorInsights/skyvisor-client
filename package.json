@@ -10,7 +10,8 @@
     "vendor": "mkdir -p app/static/css/files && cp node_modules/@fontsource-variable/geist/files/*.woff2 app/static/css/files/ && cp node_modules/maplibre-gl/dist/maplibre-gl.css app/static/css/maplibre-gl.css && cp node_modules/ol/dist/ol.js app/static/js/ol.js && cp app/assets/theme.js app/static/js/theme.js",
     "build": "bun run clean && bun run build:css && bun run build:js && bun run vendor",
     "dev:css": "tailwindcss -i app/assets/styles.css -o app/static/css/app.css --watch",
-    "check": "bun run build"
+    "test": "bun test app/assets",
+    "check": "bun test app/assets && bun run build"
   },
   "dependencies": {
     "@fontsource-variable/geist": "5.2.9",

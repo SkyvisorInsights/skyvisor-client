@@ -1,6 +1,6 @@
 import maplibregl from 'maplibre-gl'
 import { parseNumber, reducedMotion } from '../../core/env.js'
-import { greatCirclePoints, routePointAtProgress } from '../geometry.js'
+import { arcFeature, arcPoints, pointAtProgress } from '../great-circle.js'
 
 export function flightLayers(map, element) {
   const depLon = parseNumber(element.dataset.depLon)
@@ -13,25 +13,22 @@ export function flightLayers(map, element) {
 
   const dep = [depLon, depLat]
   const arr = [arrLon, arrLat]
-  const route = greatCirclePoints(dep, arr)
   const progress = parseNumber(element.dataset.progress) ?? 42
-  const planePos = liveLon != null && liveLat != null ? [liveLon, liveLat] : routePointAtProgress(dep, arr, progress)
+  const routeFeature = arcFeature(dep, arr)
+  const planePos = liveLon != null && liveLat != null
+    ? [liveLon, liveLat]
+    : pointAtProgress(dep, arr, progress / 100)
+  const planeFeature = { type: 'Feature', geometry: { type: 'Point', coordinates: planePos }, properties: {} }
 
   if (!map.getSource('flight-route')) {
-    map.addSource('flight-route', {
-      type: 'geojson',
-      data: { type: 'Feature', geometry: { type: 'LineString', coordinates: route }, properties: {} },
-    })
+    map.addSource('flight-route', { type: 'geojson', data: routeFeature })
     map.addLayer({
       id: 'flight-route-line',
       type: 'line',
       source: 'flight-route',
       paint: { 'line-color': '#60a5fa', 'line-width': 2.5, 'line-opacity': 0.85 },
     })
-    map.addSource('flight-plane', {
-      type: 'geojson',
-      data: { type: 'Feature', geometry: { type: 'Point', coordinates: planePos }, properties: {} },
-    })
+    map.addSource('flight-plane', { type: 'geojson', data: planeFeature })
     map.addLayer({
       id: 'flight-plane-dot',
       type: 'circle',
@@ -44,10 +41,13 @@ export function flightLayers(map, element) {
       },
     })
   } else {
-    map.getSource('flight-route').setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: route }, properties: {} })
-    map.getSource('flight-plane').setData({ type: 'Feature', geometry: { type: 'Point', coordinates: planePos }, properties: {} })
+    map.getSource('flight-route').setData(routeFeature)
+    map.getSource('flight-plane').setData(planeFeature)
   }
 
-  const bounds = route.reduce((acc, coord) => acc.extend(coord), new maplibregl.LngLatBounds(route[0], route[0]))
+  // Bounds are computed from sampled points rather than the arc geometry so
+  // antimeridian-split MultiLineStrings do not need special handling here.
+  const sampled = arcPoints(dep, arr, 48)
+  const bounds = sampled.reduce((acc, coord) => acc.extend(coord), new maplibregl.LngLatBounds(sampled[0], sampled[0]))
   map.fitBounds(bounds, { padding: 72, maxZoom: 6.5, duration: reducedMotion() ? 0 : 900 })
 }

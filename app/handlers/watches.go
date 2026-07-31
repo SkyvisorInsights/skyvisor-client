@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components/flightui"
 	watchesview "github.com/SkyvisorInsights/Aviation-tracker/app/view/watches"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
@@ -109,10 +110,12 @@ func (h *Handler) SharePage(w http.ResponseWriter, r *http.Request) error {
 			return nil
 		}
 		slog.ErrorContext(r.Context(), "public share", "error", err)
-		page := watchesview.SharePage(apiclient.PublicShare{}, "This share link is unavailable or expired.")
+		page := watchesview.SharePage(apiclient.PublicShare{}, flightui.MapAttrs{}, "This share link is unavailable or expired.")
 		return h.CreateLayout(w, r, "Shared flight", page).Render(r.Context(), w)
 	}
-	page := watchesview.SharePage(view, "")
+	// Resolve airport positions here so the template stays a pure renderer.
+	mapAttrs := flightui.MapAttrsFromAPIFlight(view.FlightNumber, view.Flight, h.coordLookup())
+	page := watchesview.SharePage(view, mapAttrs, "")
 	return h.CreateLayout(w, r, "Shared flight "+view.FlightNumber, page).Render(r.Context(), w)
 }
 

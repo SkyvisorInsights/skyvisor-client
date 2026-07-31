@@ -26,52 +26,41 @@ type MapAttrs struct {
 	ProgressPct  int
 }
 
-func enrichFlightCoords(flight *models.LiveFlights) {
-	if flight == nil {
+// CoordLookup resolves an IATA code to a position. Injected by the handler
+// layer so this package stays free of database access and its helpers remain
+// pure functions the tests can exercise directly.
+type CoordLookup func(iata string) (lat, lon float64, ok bool)
+
+// EnrichFlightCoordsWith fills in missing airport coordinates.
+//
+// A nil lookup, or an unknown code, leaves the coordinates empty. That is
+// deliberate: an unplottable route should be reported as unplottable rather
+// than drawn from invented geography.
+func EnrichFlightCoordsWith(flight *models.LiveFlights, lookup CoordLookup) {
+	if flight == nil || lookup == nil {
 		return
 	}
 	if flight.DepartureLatitude == "" {
-		if coord, ok := airportCoord(flight.Departure.Iata); ok {
-			flight.DepartureLatitude = coord[0]
-			flight.DepartureLongitude = coord[1]
+		if lat, lon, ok := lookup(flight.Departure.Iata); ok {
+			flight.DepartureLatitude = formatCoordValue(lat)
+			flight.DepartureLongitude = formatCoordValue(lon)
 		}
 	}
 	if flight.ArrivalLatitude == "" {
-		if coord, ok := airportCoord(flight.Arrival.Iata); ok {
-			flight.ArrivalLatitude = coord[0]
-			flight.ArrivalLongitude = coord[1]
+		if lat, lon, ok := lookup(flight.Arrival.Iata); ok {
+			flight.ArrivalLatitude = formatCoordValue(lat)
+			flight.ArrivalLongitude = formatCoordValue(lon)
 		}
 	}
 }
 
-func airportCoord(iata string) ([2]string, bool) {
-	table := map[string][2]string{
-		"LIS": {"38.7813", "-9.1359"},
-		"LHR": {"51.4700", "-0.4543"},
-		"JFK": {"40.6413", "-73.7781"},
-		"LAX": {"33.9425", "-118.4085"},
-		"CDG": {"49.0097", "2.5479"},
-		"FRA": {"50.0379", "8.5622"},
-		"DXB": {"25.2532", "55.3657"},
-		"SIN": {"1.3644", "103.9915"},
-		"MAD": {"40.4983", "-3.5676"},
-		"FCO": {"41.8003", "12.2389"},
-	}
-	coord, ok := table[strings.ToUpper(strings.TrimSpace(iata))]
-	return coord, ok
+func formatCoordValue(value float64) string {
+	return strconv.FormatFloat(value, 'f', -1, 64)
 }
 
-// EnrichFlightCoords fills missing airport coordinates from a small IATA table.
-func EnrichFlightCoords(flight *models.LiveFlights) {
-	enrichFlightCoords(flight)
-}
-
+// MapAttrsFromFlight is pure: it reads whatever coordinates the flight already
+// carries. Callers are responsible for running EnrichFlightCoordsWith first.
 func MapAttrsFromFlight(flightNumber string, flight *models.LiveFlights) MapAttrs {
-	if flight != nil {
-		clone := *flight
-		enrichFlightCoords(&clone)
-		flight = &clone
-	}
 	attrs := MapAttrs{
 		Latitude:     28,
 		Longitude:    -12,
