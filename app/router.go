@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
@@ -32,6 +33,21 @@ import (
 
 //go:embed static
 var staticFS embed.FS
+
+// staticCacheHeaders caches content-addressed assets aggressively and everything
+// else conservatively. Only files under /static/geo/ carry a version in their
+// name (world-land-v1.json), so only those are safe to mark immutable; the JS
+// and CSS bundles keep stable names and must stay revalidated.
+func staticCacheHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/static/geo/") {
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			w.Header().Set("Cache-Control", "public, max-age=3600")
+		}
+		next.ServeHTTP(w, r)
+	})
+}
 
 func setupBusinessComponents(pool *pgxpool.Pool, redisClient *redis.Client, validate *validator.Validate,
 	sessionSecret []byte, cookieSecure bool, oidcClient *auth.Client,
@@ -122,8 +138,20 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		_, _ = w.Write([]byte(`{"status":"ready"}`))
 	})
 
-	// Static files
-	r.Handle("/static/*", http.FileServer(http.FS(staticFS)))
+	// Static files.
+	//
+	// Compression is scoped to this subtree rather than applied globally: the
+	// /events SSE stream must not be buffered by a compressor. The basemap
+	// GeoJSON is ~448 KB raw and ~98 KB gzipped, so this is the difference
+	// between a fast and a sluggish first globe render.
+	r.Group(func(static chi.Router) {
+		static.Use(chimiddleware.Compress(5,
+			"application/javascript", "text/javascript", "text/css",
+			"application/json", "image/svg+xml",
+		))
+		static.Use(staticCacheHeaders)
+		static.Handle("/static/*", http.FileServer(http.FS(staticFS)))
+	})
 	if scriptFS, err := fs.Sub(thinkingorbs.ScriptFS, "orb"); err != nil {
 		slog.Error("thinking orbs script fs", "error", err)
 	} else {
