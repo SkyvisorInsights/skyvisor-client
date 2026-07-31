@@ -21,6 +21,17 @@ Alpine.data('flightSearch', () => ({
   },
 }))
 
+const globeDrawerKey = 'skyvisor-globe-drawer'
+
+Alpine.data('globeDrawer', () => ({
+  open: localStorage.getItem(globeDrawerKey) !== 'closed',
+  init() {
+    this.$watch('open', (value) => {
+      localStorage.setItem(globeDrawerKey, value ? 'open' : 'closed')
+    })
+  },
+}))
+
 // --- lazy map bundle ------------------------------------------------------
 //
 // MapLibre and its layer code live in a separate bundle that is only fetched

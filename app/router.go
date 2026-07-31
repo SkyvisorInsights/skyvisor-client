@@ -201,6 +201,8 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		auth.Post("/logout", handler(h.Logout))
 		auth.Get("/welcome", handler(h.WelcomePage))
 		auth.Get("/dashboard", handler(h.DashboardPage))
+		auth.Get("/globe", handler(h.GlobePage))
+		auth.Get("/globe/data", handler(h.GlobeData))
 		auth.Get("/settings", handler(h.SettingsPage))
 		auth.Post("/settings/alerts", handler(h.SettingsAlerts))
 		auth.Post("/settings/tokens", handler(h.SettingsTokensCreate))
