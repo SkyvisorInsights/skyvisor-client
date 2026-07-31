@@ -1,0 +1,112 @@
+package globe
+
+import "fmt"
+
+// Activities is the bottom drawer.
+//
+// It is also the accessible equivalent of the globe. A WebGL canvas is not an
+// accessible control and pretending otherwise is worse than admitting it, so
+// every route and flight drawn on the sphere also appears here as a focusable
+// row that flies the camera when focused. The data is fully reachable without
+// ever touching the canvas.
+templ Activities(v View) {
+	<section
+		id="globe-activities"
+		class="pointer-events-auto border-t border-border/60 bg-card/92 backdrop-blur-md"
+		x-data="globeDrawer"
+		aria-labelledby="globe-activities-heading"
+	>
+		<div class="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+			<h2 id="globe-activities-heading" class="text-sm font-semibold">Activities</h2>
+			<div class="flex items-center gap-3">
+				<span class="font-mono text-[11px] text-muted-foreground">
+					{ fmt.Sprintf("%d", len(v.Attention)) }
+				</span>
+				<button
+					type="button"
+					class="inline-flex items-center gap-1.5 rounded-md border border-border/70 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted/50"
+					@click="open = !open"
+					:aria-expanded="open ? 'true' : 'false'"
+					aria-controls="globe-activities-body"
+				>
+					<span x-text="open ? 'Hide' : 'Show'">Hide</span>
+				</button>
+			</div>
+		</div>
+		<div id="globe-activities-body" x-show="open" x-cloak class="max-h-[34vh] overflow-y-auto border-t border-border/60">
+			if len(v.Attention) == 0 {
+				<p class="px-4 py-6 text-sm text-muted-foreground sm:px-6">
+					if v.Envelope.Stats.HasOperations {
+						No operational risks detected in this window.
+					} else {
+						Live operations are unavailable, so nothing can be listed here.
+					}
+				</p>
+			} else {
+				<table class="w-full text-left text-sm">
+					<caption class="sr-only">Flights and routes drawn on the globe. Focus a row to move the globe to it.</caption>
+					<thead class="sticky top-0 bg-card/95 text-[11px] uppercase tracking-wider text-muted-foreground">
+						<tr>
+							<th scope="col" class="px-4 py-2 font-medium sm:px-6">Flight</th>
+							<th scope="col" class="px-4 py-2 font-medium">Route</th>
+							<th scope="col" class="px-4 py-2 font-medium">Status</th>
+							<th scope="col" class="px-4 py-2 font-medium">Detail</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, row := range v.Attention {
+							<tr
+								class="border-t border-border/50 transition-colors focus-within:bg-muted/50 hover:bg-muted/40"
+								tabindex="0"
+								data-globe-focus={ row.ID }
+								if row.HasPoint {
+									data-globe-lon={ fmt.Sprintf("%.6f", row.Lon) }
+									data-globe-lat={ fmt.Sprintf("%.6f", row.Lat) }
+								}
+							>
+								<td class="px-4 py-2.5 font-mono text-xs font-semibold sm:px-6">
+									if row.Flight != "" {
+										{ Callsign(row.Flight) }
+									} else {
+										{ "—" }
+									}
+								</td>
+								<td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{ RouteLabel(row.Dep, row.Arr) }</td>
+								<td class="px-4 py-2.5">
+									@severityChip(row.Severity)
+								</td>
+								<td class="px-4 py-2.5 text-xs text-muted-foreground">{ row.Reason }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</div>
+	</section>
+}
+
+templ severityChip(severity string) {
+	<span class={ "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium", severityClass(severity) }>
+		{ severityLabel(severity) }
+	</span>
+}
+
+func severityClass(severity string) string {
+	switch severity {
+	case "critical", "high":
+		return "bg-destructive/15 text-destructive"
+	case "medium":
+		return "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+	case "low":
+		return "bg-primary/15 text-primary"
+	default:
+		return "bg-muted text-muted-foreground"
+	}
+}
+
+func severityLabel(severity string) string {
+	if severity == "" {
+		return "Unknown"
+	}
+	return severity
+}
