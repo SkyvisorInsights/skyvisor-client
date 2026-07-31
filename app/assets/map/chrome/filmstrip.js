@@ -1,9 +1,8 @@
 import { reducedMotion } from '../../core/env.js'
-import { AIRPORT_COORDS } from '../coords.js'
 
 // Dashboard fleet filmstrip: clicking an airport chip flies the fleet map to it.
-// Lives in the map bundle because it only matters on pages that render a map,
-// and because it shares the coordinate table with fleet mode.
+// Coordinates come from data attributes resolved server-side; a watch whose
+// origin could not be resolved simply does not move the map.
 export function initFleetFilmstrip(root = document) {
   root.querySelectorAll('[data-fleet-filmstrip]').forEach((strip) => {
     if (strip.dataset.fleetFilmstripReady === 'true') return
@@ -15,12 +14,14 @@ export function initFleetFilmstrip(root = document) {
           item.classList.remove('border-primary/50', 'bg-primary/5')
         })
         button.classList.add('border-primary/50', 'bg-primary/5')
-        const iata = button.dataset.fleetIata
-        const coord = iata && AIRPORT_COORDS[iata]
+
+        const lon = Number(button.dataset.fleetLon)
+        const lat = Number(button.dataset.fleetLat)
         const map = mapEl?._skyvisorMap
-        if (coord && map) {
-          map.flyTo({ center: coord, zoom: 5.5, duration: reducedMotion() ? 0 : 900 })
-        }
+        if (!map || !Number.isFinite(lon) || !Number.isFinite(lat)) return
+        if (button.dataset.fleetLon === '' || button.dataset.fleetLat === '') return
+
+        map.flyTo({ center: [lon, lat], zoom: 5.5, duration: reducedMotion() ? 0 : 900 })
       })
     })
   })

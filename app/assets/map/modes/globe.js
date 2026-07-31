@@ -1,5 +1,5 @@
-import { GreatCircle } from 'arc'
 import { reducedMotion } from '../../core/env.js'
+import { arcFeature } from '../great-circle.js'
 
 // Great-circle routes between hub airports for the marketing globe.
 // TEMPORARY: P4 replaces these with real aggregate route data from
@@ -16,10 +16,7 @@ const globeRoutes = [
 function globeArcFeatures() {
   return {
     type: 'FeatureCollection',
-    features: globeRoutes.map(({ from, to }) => {
-      const generator = new GreatCircle({ x: from[0], y: from[1] }, { x: to[0], y: to[1] })
-      return generator.Arc(64, { offset: 10 }).json()
-    }),
+    features: globeRoutes.map(({ from, to }) => arcFeature(from, to)),
   }
 }
 

@@ -49,14 +49,17 @@ func LiveFlightFromAPI(f apiclient.Flight) models.LiveFlights {
 			AgeSeconds: f.Freshness.AgeSeconds,
 		}
 	}
-	EnrichFlightCoords(&out)
 	return out
 }
 
-func MapAttrsFromAPIFlight(flightNumber string, f *apiclient.Flight) MapAttrs {
+// MapAttrsFromAPIFlight builds map attributes for a provider flight, resolving
+// airport positions through the supplied lookup. Pass nil to plot only the live
+// aircraft position (if any) and no route.
+func MapAttrsFromAPIFlight(flightNumber string, f *apiclient.Flight, lookup CoordLookup) MapAttrs {
 	if f == nil {
 		return MapAttrs{FlightNumber: flightNumber}
 	}
 	live := LiveFlightFromAPI(*f)
+	EnrichFlightCoordsWith(&live, lookup)
 	return MapAttrsFromFlight(flightNumber, &live)
 }
