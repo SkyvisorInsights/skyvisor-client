@@ -62,10 +62,10 @@
      label halo), so they live here alongside the rest rather than pretending
      --muted is a coastline. Resolved to sRGB at runtime by map/palette.js,
      since MapLibre cannot parse oklch() or read custom properties. */
-  --map-ocean: oklch(0.93 0.015 245);
-  --map-land: oklch(0.975 0.006 247);
-  --map-boundary: oklch(0.84 0.018 250);
-  --map-graticule: oklch(0.89 0.012 248);
+  --map-ocean: oklch(0.87 0.045 240);
+  --map-land: oklch(0.975 0.005 250);
+  --map-boundary: oklch(0.71 0.035 250);
+  --map-graticule: oklch(0.81 0.03 243);
   --map-arc-ok: var(--primary);
   --map-arc-watch: oklch(0.68 0.16 75);
   --map-arc-risk: var(--destructive);

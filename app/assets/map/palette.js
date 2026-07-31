@@ -78,8 +78,7 @@ export function cssColorToRGBA(value) {
   return `rgba(${r}, ${g}, ${b}, ${Number((a / 255).toFixed(3))})`
 }
 
-// Reads the current --map-* tokens for the active theme.
-export function resolveMapPalette(root = document.documentElement) {
+function readTokens(root) {
   const styles = getComputedStyle(root)
   const palette = {}
   for (const key of PALETTE_KEYS) {
@@ -87,4 +86,32 @@ export function resolveMapPalette(root = document.documentElement) {
     palette[key] = cssColorToRGBA(raw) ?? PALETTE_FALLBACK[key]
   }
   return palette
+}
+
+// Reads the --map-* tokens for the active theme.
+//
+// `scheme` forces a palette regardless of the page theme, for containers that
+// are painted a fixed colour — the marketing globe sits on a hardcoded dark
+// panel, so a light-theme page would otherwise render a pale globe on it.
+// Forcing is done by resolving the tokens inside a throwaway `.dark` element so
+// the values still come from the stylesheet rather than a second hardcoded set.
+export function resolveMapPalette(scheme) {
+  if (scheme !== 'dark' && scheme !== 'light') {
+    return readTokens(document.documentElement)
+  }
+
+  const pageIsDark = document.documentElement.classList.contains('dark')
+  if ((scheme === 'dark') === pageIsDark) {
+    return readTokens(document.documentElement)
+  }
+
+  const probe = document.createElement('div')
+  probe.className = scheme === 'dark' ? 'dark' : ''
+  probe.style.cssText = 'position:absolute;width:0;height:0;opacity:0;pointer-events:none'
+  document.body.appendChild(probe)
+  try {
+    return readTokens(probe)
+  } finally {
+    probe.remove()
+  }
 }

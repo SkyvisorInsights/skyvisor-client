@@ -26,12 +26,14 @@ const (
 )
 
 // GlobePage renders the authenticated Global View.
+//
+// The route sits behind RequireAuth, so reaching this handler means the visitor
+// already has a session. Redirecting to /login when the API token is missing
+// would bounce them straight back out again — /login is guest-only and sends
+// authenticated users to the homepage — leaving them on a random page with no
+// explanation. Render the globe and say what is unavailable instead.
 func (h *Handler) GlobePage(w http.ResponseWriter, r *http.Request) error {
-	accessToken, err := h.apiAccessToken(r)
-	if err != nil || accessToken == "" || h.service.API() == nil {
-		http.Redirect(w, r, "/login?return_to=/globe", http.StatusSeeOther)
-		return nil
-	}
+	accessToken, _ := h.apiAccessToken(r)
 
 	view, err := h.buildGlobeView(r, accessToken)
 	if err != nil {
@@ -148,9 +150,14 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 	// each one degrade on its own. A single failing panel must never take down
 	// the page.
 	started := time.Now()
+	hasSession := accessToken != "" && h.service.API() != nil
+
 	group, groupCtx := errgroup.WithContext(ctx)
 
 	group.Go(func() error {
+		if !hasSession {
+			return nil
+		}
 		report, err := h.service.API().Analytics(groupCtx, accessToken, apiclient.AnalyticsQuery{
 			Airline:    filters.Airline,
 			Airport:    filters.Airport,
@@ -165,6 +172,9 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 	})
 
 	group.Go(func() error {
+		if !hasSession {
+			return nil
+		}
 		report, err := h.service.API().OperationsDashboard(groupCtx, accessToken)
 		if err != nil {
 			slog.WarnContext(r.Context(), "globe operations unavailable", "error", err)
@@ -175,6 +185,9 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 	})
 
 	group.Go(func() error {
+		if !hasSession {
+			return nil
+		}
 		metrics, err := h.service.API().DecisionTrustMetrics(groupCtx, accessToken)
 		if err != nil {
 			slog.WarnContext(r.Context(), "globe trust metrics unavailable", "error", err)
@@ -225,7 +238,10 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 	}
 
 	message := ""
-	if !hasAnalytics && !hasOperations {
+	switch {
+	case !hasSession:
+		message = "Your session has no API access. Sign in again to load live routes and flights."
+	case !hasAnalytics && !hasOperations:
 		message = "Live data is temporarily unavailable. The globe shows the basemap only."
 	}
 

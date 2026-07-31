@@ -75,7 +75,7 @@ func Page(v View) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-zoom=\"1.35\" class=\"absolute inset-0\" aria-hidden=\"true\"></div><div id=\"globe-fallback\" class=\"pointer-events-none absolute inset-0 flex items-center justify-center\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-zoom=\"1.35\" class=\"h-full w-full\" aria-hidden=\"true\"></div><div id=\"globe-fallback\" class=\"pointer-events-none absolute inset-0 flex items-center justify-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
