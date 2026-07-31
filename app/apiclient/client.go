@@ -46,6 +46,8 @@ type (
 	Entitlements              = domain.Entitlements
 	AirportBoard              = domain.AirportBoard
 	AnalyticsReport           = domain.AnalyticsReport
+	RouteStat                 = domain.RouteStat
+	AirportStat               = domain.AirportStat
 	WhatIfRequest             = domain.WhatIfRequest
 	WhatIfResult              = domain.WhatIfResult
 	LogisticsQuery            = domain.LogisticsQuery
