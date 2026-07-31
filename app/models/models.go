@@ -82,6 +82,18 @@ type SidebarItem struct {
 	SubItems   []SidebarItem
 }
 
+// LayoutVariant selects the page shell.
+//
+// "canvas" is for full-viewport views (the globe, the public trust share): the
+// navbar overlays the content, the footer is dropped, and main is height-locked
+// so an inner canvas can fill the screen without the page scrolling.
+type LayoutVariant string
+
+const (
+	LayoutDefault LayoutVariant = ""
+	LayoutCanvas  LayoutVariant = "canvas"
+)
+
 type LayoutTempl struct {
 	Title     string
 	Nav       []NavItem
@@ -89,6 +101,7 @@ type LayoutTempl struct {
 	User      *UserSession
 	Content   templ.Component
 	CSRFToken string
+	Variant   LayoutVariant
 }
 
 type SettingsPage struct {
