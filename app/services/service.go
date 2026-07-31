@@ -16,6 +16,7 @@ type Service struct {
 	accountRepo  *repository.AccountRepository
 	oidc         *auth.Client
 	api          *apiclient.Client
+	geo          *GeoResolver
 }
 
 func HandleError(err error, message string) {
@@ -41,6 +42,7 @@ func NewService(
 		accountRepo:  accountRepo,
 		oidc:         oidc,
 		api:          api,
+		geo:          NewGeoResolver(airportRepo),
 	}
 }
 

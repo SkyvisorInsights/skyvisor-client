@@ -2,9 +2,10 @@ package dashboard
 
 import (
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
-templ Page(d apiclient.OperationsDashboard, message string) {
+templ Page(d apiclient.OperationsDashboard, markers []models.FleetMarker, message string) {
 	<section id="operations-dashboard" class="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-7 sm:px-6 lg:pt-9" data-live-refresh-url="/dashboard?partial=dashboard" data-live-refresh-target="#operations-dashboard">
 		<div class="sky-grid pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 opacity-45"></div>
 		<header class="flex flex-col gap-5 border-b border-border/80 pb-7 lg:flex-row lg:items-end lg:justify-between">
@@ -53,6 +54,8 @@ templ Page(d apiclient.OperationsDashboard, message string) {
 							class="min-w-[9.5rem] shrink-0 rounded-lg border border-border/80 bg-background/80 px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-muted/40"
 							data-fleet-focus={ watch.FlightNumber }
 							data-fleet-iata={ fleetOriginIATA(watch) }
+							data-fleet-lon={ fleetMarkerLon(markers, watch.FlightNumber) }
+							data-fleet-lat={ fleetMarkerLat(markers, watch.FlightNumber) }
 						>
 							<div class="font-mono text-sm font-semibold">{ watch.FlightNumber }</div>
 							<div class="mt-0.5 font-mono text-[11px] text-muted-foreground">{ watch.Route }</div>
@@ -64,7 +67,7 @@ templ Page(d apiclient.OperationsDashboard, message string) {
 					id="fleet-map"
 					data-skyvisor-map
 					data-map-mode="fleet"
-					data-markers={ watchMarkersJSON(d.Watches) }
+					data-markers={ watchMarkersJSON(markers) }
 					data-latitude="30"
 					data-longitude="-20"
 					data-zoom="1.4"

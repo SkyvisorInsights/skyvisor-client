@@ -62,6 +62,20 @@ func setupBusinessComponents(pool *pgxpool.Pool, redisClient *redis.Client, vali
 	// Service
 	service := services.NewService(airlineRepo, airportRepo, locationRepo, flightsRepo, authRepo, oidcClient, apiClient)
 
+	// Load the airport coordinate table off the boot path. Lookups arriving
+	// before this finishes trigger their own lazy load via singleflight, so a
+	// slow database delays the first map rather than the whole server.
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if err := service.Geo().Warm(ctx); err != nil {
+			slog.Warn("airport coordinate warm-up failed", "error", err)
+			return
+		}
+		count, loadedAt := service.Geo().Stats()
+		slog.Info("airport coordinates loaded", "airports", count, "loaded_at", loadedAt)
+	}()
+
 	// Handler
 	handler := handlers.NewHandler(service, sessionStore, pool, redisClient, oidcClient)
 
