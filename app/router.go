@@ -43,7 +43,12 @@ func staticCacheHeaders(next http.Handler) http.Handler {
 		if strings.HasPrefix(r.URL.Path, "/static/geo/") {
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		} else {
-			w.Header().Set("Cache-Control", "public, max-age=3600")
+			// The JS and CSS bundles keep stable filenames, so they must be
+			// revalidated on every request rather than served blind from cache.
+			// max-age here would pin users to stale JS until it expired — and
+			// makes local changes invisible for the same reason.
+			// no-cache still allows 304s, so unchanged bundles cost one HEAD.
+			w.Header().Set("Cache-Control", "no-cache")
 		}
 		next.ServeHTTP(w, r)
 	})

@@ -9,9 +9,10 @@ import { hasWebGL, isLowPowerDevice } from './webgl.js'
 // Every live map, so a theme change can repaint them all.
 const active = new Set()
 
+// Each map remembers the scheme it was created with, so a theme toggle does not
+// repaint a deliberately-dark container with light colours.
 function applyPalette() {
-  const palette = resolveMapPalette()
-  active.forEach((map) => repaint(map, palette))
+  active.forEach((map) => repaint(map, resolveMapPalette(map._skyvisorScheme)))
 }
 
 // Themes are announced by core/theme.js. Registered once at module load.
@@ -69,7 +70,8 @@ export function initMaps(root = document) {
     element.dataset.mapReady = 'true'
 
     const center = [Number(element.dataset.longitude || 0), Number(element.dataset.latitude || 28)]
-    const palette = resolveMapPalette()
+    const scheme = element.dataset.mapScheme || ''
+    const palette = resolveMapPalette(scheme)
     const lowPower = isLowPowerDevice()
 
     let map
@@ -97,7 +99,18 @@ export function initMaps(root = document) {
     }
 
     element._skyvisorMap = map
+    map._skyvisorScheme = scheme
     active.add(map)
+
+    // MapLibre measures the container once at construction. On a flex page the
+    // final height often arrives after that, and MapLibre sets position:relative
+    // on its container, which defeats absolute positioning — either way the map
+    // can be left sized to nothing. Track the box instead of assuming it.
+    if (typeof ResizeObserver === 'function') {
+      const resizer = new ResizeObserver(() => map.resize())
+      resizer.observe(element)
+      map._skyvisorResizer = resizer
+    }
     map.on('remove', () => active.delete(map))
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     map.addControl(new maplibregl.AttributionControl({ compact: true }))
@@ -127,11 +140,17 @@ export function initMaps(root = document) {
         element._skyvisorLabels = renderLabels(maplibregl, map, data)
         element._skyvisorSpin = spinGlobe(map, element)
       }
-    })
 
-    // idle fires after the first complete render, which is the honest moment to
-    // hand over from the server-rendered globe.
-    map.once('idle', () => revealCanvas(element))
+      // MapLibre fires load once resources are downloaded AND the first
+      // visually complete render has happened, so this is the honest moment to
+      // hand over from the server-rendered globe — and the layers above now
+      // exist, so the handover never shows a bare basemap.
+      //
+      // Deliberately not 'idle': the globe's idle spin queues a new easeTo on
+      // every moveend, so a visible globe never becomes idle and the canvas
+      // would stay hidden forever.
+      revealCanvas(element)
+    })
   })
 }
 
@@ -152,6 +171,7 @@ export function teardownMap(element) {
   if (element._skyvisorLabels) element._skyvisorLabels()
   element._skyvisorSpin = null
   element._skyvisorLabels = null
+  if (map._skyvisorResizer) map._skyvisorResizer.disconnect()
   active.delete(map)
   map.remove()
   element._skyvisorMap = null
