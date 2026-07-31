@@ -127,6 +127,28 @@ body { min-height: 100dvh; background: var(--background); color: var(--foregroun
 .flight-route { stroke-dasharray: 5 7; animation: route-drift 16s linear infinite; }
 .flight-progress-bar { transition: width 0.01ms linear; }
 .sky-fog { background: color-mix(in oklab, var(--card) 88%, transparent); backdrop-filter: blur(12px); }
+
+/* Callsign and hub chips, rendered as DOM markers on the globe. Markers rather
+   than a symbol layer avoids self-hosting ~1.5MB of SDF glyph PBFs and gives
+   the bordered pill the design calls for. */
+.skyvisor-map-chip {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.4rem; border-radius: 9999px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 0.02em; white-space: nowrap; pointer-events: none;
+  color: var(--map-label);
+  background: color-mix(in oklab, var(--map-label-halo) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--map-boundary) 70%, transparent);
+  backdrop-filter: blur(3px);
+}
+.skyvisor-map-chip[data-chip-kind="flight"] {
+  color: var(--map-ocean); background: var(--map-flight); border-color: transparent;
+}
+
+/* The WebGL globe fades in only once it has actually drawn a frame, so the
+   server-rendered SVG is never replaced by an empty canvas. */
+[data-globe-canvas] { opacity: 0; transition: opacity 260ms ease; }
+[data-globe-canvas][data-map-rendered="true"] { opacity: 1; }
 .htmx-indicator { opacity: 0; transition: opacity 160ms ease; pointer-events: none; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
 
