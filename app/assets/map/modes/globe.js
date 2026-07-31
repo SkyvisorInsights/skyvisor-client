@@ -20,7 +20,7 @@ function globeArcFeatures() {
   }
 }
 
-export function globeLayers(map) {
+export function globeLayers(map, palette) {
   map.setProjection({ type: 'globe' })
   map.addSource('globe-arcs', { type: 'geojson', data: globeArcFeatures() })
   map.addLayer({
@@ -28,7 +28,7 @@ export function globeLayers(map) {
     type: 'line',
     source: 'globe-arcs',
     paint: {
-      'line-color': '#60a5fa',
+      'line-color': palette['arc-ok'],
       'line-width': 1.6,
       'line-opacity': 0.85,
     },
@@ -50,7 +50,7 @@ export function globeLayers(map) {
     source: 'globe-hubs',
     paint: {
       'circle-radius': 2.5,
-      'circle-color': '#93c5fd',
+      'circle-color': palette.hub,
       'circle-opacity': 0.9,
     },
   })
