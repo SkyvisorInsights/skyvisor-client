@@ -8,7 +8,9 @@ import (
 
 // View is everything the globe page renders.
 type View struct {
-	Envelope   Envelope
+	Envelope Envelope
+	// Demo marks the payload as fabricated local data. The page must say so.
+	Demo       bool
 	Message    string
 	Attention  []AttentionRow
 	Ortho      Ortho
@@ -105,6 +107,17 @@ templ header(v View) {
 			<span aria-hidden="true">·</span>
 			<span>{ fmt.Sprintf("%d day window", v.Envelope.WindowDays) }</span>
 		</div>
+		// Latency and freshness. Both start hidden and are filled in by the
+		// client, because both measure something only the client can observe.
+		<div class="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+			<span id="globe-link-latency" hidden></span>
+			<span id="globe-data-age" data-tone="unknown" hidden></span>
+		</div>
+		if v.Demo {
+			<p class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+				Demo data — not live
+			</p>
+		}
 		if v.Message != "" {
 			<p class="mt-2 max-w-xl text-sm text-muted-foreground">{ v.Message }</p>
 		}

@@ -102,15 +102,6 @@ export function initMaps(root = document) {
     map._skyvisorScheme = scheme
     active.add(map)
 
-    // MapLibre measures the container once at construction. On a flex page the
-    // final height often arrives after that, and MapLibre sets position:relative
-    // on its container, which defeats absolute positioning — either way the map
-    // can be left sized to nothing. Track the box instead of assuming it.
-    if (typeof ResizeObserver === 'function') {
-      const resizer = new ResizeObserver(() => map.resize())
-      resizer.observe(element)
-      map._skyvisorResizer = resizer
-    }
     map.on('remove', () => active.delete(map))
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     map.addControl(new maplibregl.AttributionControl({ compact: true }))
@@ -141,10 +132,25 @@ export function initMaps(root = document) {
         element._skyvisorSpin = spinGlobe(map, element)
       }
 
-      // MapLibre fires load once resources are downloaded AND the first
-      // visually complete render has happened, so this is the honest moment to
-      // hand over from the server-rendered globe — and the layers above now
-      // exist, so the handover never shows a bare basemap.
+      // MapLibre measures the container once at construction, and on a flex
+      // page the final height often arrives later. Re-measure now, then track
+      // the box for later layout changes.
+      //
+      // Deliberately not before this point: ResizeObserver fires synchronously
+      // on observe(), and resizing a map whose style has not finished loading
+      // throws "no tile manager with ID", which leaves the style permanently
+      // broken and load never fires at all.
+      map.resize()
+      if (typeof ResizeObserver === 'function') {
+        const resizer = new ResizeObserver(() => map.resize())
+        resizer.observe(element)
+        map._skyvisorResizer = resizer
+      }
+
+      // load fires once resources are downloaded AND the first visually
+      // complete render has happened, so this is the honest moment to hand over
+      // from the server-rendered globe — and the layers above now exist, so the
+      // handover never shows a bare basemap.
       //
       // Deliberately not 'idle': the globe's idle spin queues a new easeTo on
       // every moveend, so a visible globe never becomes idle and the canvas
