@@ -74,15 +74,13 @@ export function initMaps(root = document) {
     const palette = resolveMapPalette(scheme)
     const lowPower = isLowPowerDevice()
 
-    const builtStyle = element.dataset.styleUrl || buildStyle(palette)
-    window.__mapDebug = { palette, style: builtStyle, stage: 'pre-construct' }
     let map
     try {
       map = new maplibregl.Map({
         container: element,
         // Self-hosted Natural Earth basemap. data-style-url still overrides, so
         // a page can point at a different style without touching this code.
-        style: builtStyle,
+        style: element.dataset.styleUrl || buildStyle(palette),
         center,
         zoom: Number(element.dataset.zoom || 1.25),
         attributionControl: false,
@@ -100,7 +98,6 @@ export function initMaps(root = document) {
       return
     }
 
-    window.__mapDebug.stage = 'constructed'
     element._skyvisorMap = map
     map._skyvisorScheme = scheme
     active.add(map)
@@ -110,8 +107,6 @@ export function initMaps(root = document) {
     map.addControl(new maplibregl.AttributionControl({ compact: true }))
 
     map.on('error', (event) => {
-      window.__mapDebug.errors = window.__mapDebug.errors || []
-      window.__mapDebug.errors.push(String(event && event.error && event.error.message))
       console.error('[skyvisor] map error', event && event.error)
     })
 

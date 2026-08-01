@@ -257,7 +257,7 @@ func header(v View) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span></div><div class=\"flex items-center gap-2 font-mono text-[10px] text-muted-foreground\"><span id=\"globe-link-latency\" hidden></span> <span id=\"globe-data-age\" data-tone=\"unknown\" hidden></span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -275,7 +275,7 @@ func header(v View) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(v.Message)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 116, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 122, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -324,7 +324,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(SVGViewBox())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 125, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 131, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
@@ -337,7 +337,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(AltText(v.Envelope.Stats, v.Envelope.Unresolved))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 128, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 134, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -350,7 +350,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 137, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 143, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
@@ -363,7 +363,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 137, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 143, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -376,7 +376,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereRadius()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 137, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 143, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -389,7 +389,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 141, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 147, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
@@ -402,7 +402,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 142, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 148, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -415,7 +415,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereRadius() + 26))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 143, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 149, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 		if templ_7745c5c3_Err != nil {
@@ -428,7 +428,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 147, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 153, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 		if templ_7745c5c3_Err != nil {
@@ -441,7 +441,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 148, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 154, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 		if templ_7745c5c3_Err != nil {
@@ -454,7 +454,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereRadius()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 149, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 155, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
 		if templ_7745c5c3_Err != nil {
@@ -467,7 +467,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Ortho.GraticulePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 153, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 159, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
@@ -480,7 +480,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Ortho.LandPath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 154, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 160, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 		if templ_7745c5c3_Err != nil {
@@ -493,7 +493,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Ortho.RoutePath(v.Envelope.Routes, RiskOK))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 155, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 161, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
@@ -506,7 +506,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Ortho.RoutePath(v.Envelope.Routes, RiskWatch))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 156, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 162, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
@@ -519,7 +519,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Ortho.RoutePath(v.Envelope.Routes, RiskRisk))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 157, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 163, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
@@ -537,7 +537,7 @@ func GlobeSVG(v View) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(hub.X))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 160, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 166, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 			if templ_7745c5c3_Err != nil {
@@ -550,7 +550,7 @@ func GlobeSVG(v View) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(hub.Y))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 161, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 167, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 			if templ_7745c5c3_Err != nil {
@@ -563,7 +563,7 @@ func GlobeSVG(v View) templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(hub.Radius))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 162, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 168, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 			if templ_7745c5c3_Err != nil {
@@ -576,7 +576,7 @@ func GlobeSVG(v View) templ.Component {
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(hubFill(hub.Risk))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 163, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 169, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 			if templ_7745c5c3_Err != nil {
@@ -589,7 +589,7 @@ func GlobeSVG(v View) templ.Component {
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(hub.IATA)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 168, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 174, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -607,7 +607,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 173, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 179, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
@@ -620,7 +620,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereCenter()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 174, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 180, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
@@ -633,7 +633,7 @@ func GlobeSVG(v View) templ.Component {
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(coord(SphereRadius()))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 175, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/globe/Globe.templ`, Line: 181, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {

@@ -51,6 +51,10 @@ var demoAirports = []apiclient.AirportStat{
 	{IATA: "FCO", Departures: 201, Arrivals: 195, AvgDelayMinutes: 17},
 	{IATA: "ATL", Departures: 690, Arrivals: 672, AvgDelayMinutes: 4},
 	{IATA: "SFO", Departures: 288, Arrivals: 279, AvgDelayMinutes: 13},
+	{IATA: "ORD", Departures: 524, Arrivals: 511, AvgDelayMinutes: 21},
+	{IATA: "MIA", Departures: 312, Arrivals: 305, AvgDelayMinutes: 9},
+	{IATA: "IST", Departures: 448, Arrivals: 437, AvgDelayMinutes: 12},
+	{IATA: "DOH", Departures: 233, Arrivals: 228, AvgDelayMinutes: 7},
 }
 
 // demoFlight describes an aircraft partway along a route.
