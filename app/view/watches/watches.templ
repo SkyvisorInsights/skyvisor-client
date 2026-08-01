@@ -12,10 +12,10 @@ import (
 	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components/flightui"
 )
 
-templ SharePage(view apiclient.PublicShare, message string) {
+templ SharePage(view apiclient.PublicShare, mapAttrs flightui.MapAttrs, message string) {
 	<section class="relative min-h-[calc(100dvh-4rem)] overflow-hidden bg-[oklch(0.18_0.025_255)]">
 		if view.Flight != nil {
-			@flightui.TrackMap(flightui.MapAttrsFromAPIFlight(view.FlightNumber, view.Flight))
+			@flightui.TrackMap(mapAttrs)
 		}
 		<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/55 via-transparent to-background/90"></div>
 		<div class="relative z-10 mx-auto max-w-xl px-4 py-10 sm:px-6">

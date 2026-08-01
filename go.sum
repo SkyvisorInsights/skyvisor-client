@@ -3,8 +3,8 @@ github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d/go.mod
 github.com/Oudwins/tailwind-merge-go v0.2.1 h1:jxRaEqGtwwwF48UuFIQ8g8XT7YSualNuGzCvQ89nPFE=
 github.com/Oudwins/tailwind-merge-go v0.2.1/go.mod h1:kkZodgOPvZQ8f7SIrlWkG/w1g9JTbtnptnePIh3V72U=
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
-github.com/SkyvisorInsights/skyvisor-go-shared v0.2.0 h1:57o44FZN44XKNvHSE2zsCACgq8Zt9YMT9PQUS+DAv10=
-github.com/SkyvisorInsights/skyvisor-go-shared v0.2.0/go.mod h1:lboB8RQ3c+YvOy9AjHfQLmgEJFyH0oz34LDgUkGJYUk=
+github.com/SkyvisorInsights/skyvisor-go-shared v0.3.0 h1:21le2a4okVyicP3Ev1cNcnG5htErgnFS3EDS6b5quLc=
+github.com/SkyvisorInsights/skyvisor-go-shared v0.3.0/go.mod h1:lboB8RQ3c+YvOy9AjHfQLmgEJFyH0oz34LDgUkGJYUk=
 github.com/a-h/templ v0.3.1020 h1:ypAT/L5ySWEnZ6Zft/5yfoWXYYkhFNvEFOeeqecg4tw=
 github.com/a-h/templ v0.3.1020/go.mod h1:A2DlK61v+K+NRoGnhmYbNYVmtYHcFO5/AisMvBdDxTM=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=

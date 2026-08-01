@@ -43,10 +43,11 @@ func (h *Handler) TrackFlight(w http.ResponseWriter, r *http.Request) error {
 		switch {
 		case err == nil:
 			result = &flight
-			flightui.EnrichFlightCoords(result)
+			flightui.EnrichFlightCoordsWith(result, h.coordLookup())
 		case errors.Is(err, pgx.ErrNoRows):
 			if apiFlight, apiErr := h.lookupFlightViaAPI(r, flightNumber); apiErr == nil {
 				mapped := flightui.LiveFlightFromAPI(apiFlight)
+				flightui.EnrichFlightCoordsWith(&mapped, h.coordLookup())
 				result = &mapped
 			} else {
 				message = "We could not find that flight in the current data. Check the number and try again."

@@ -25,7 +25,9 @@ func (h *Handler) DashboardPage(w http.ResponseWriter, r *http.Request) error {
 		message = "Live operations are temporarily unavailable. Your existing watches and trips are unchanged."
 		dashboard = apiclient.OperationsDashboard{GeneratedAt: time.Now().UTC()}
 	}
-	page := dashboardview.Page(dashboard, message)
+	// Resolve watch origins to positions here; the browser has no airport table.
+	markers := dashboardview.FleetMarkersFrom(dashboard.Watches, h.service.CoordLookup())
+	page := dashboardview.Page(dashboard, markers, message)
 	if r.Header.Get("HX-Request") == "true" && r.URL.Query().Get("partial") == "dashboard" {
 		return page.Render(r.Context(), w)
 	}

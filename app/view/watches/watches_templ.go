@@ -20,7 +20,7 @@ import (
 	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components/flightui"
 )
 
-func SharePage(view apiclient.PublicShare, message string) templ.Component {
+func SharePage(view apiclient.PublicShare, mapAttrs flightui.MapAttrs, message string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -46,7 +46,7 @@ func SharePage(view apiclient.PublicShare, message string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if view.Flight != nil {
-			templ_7745c5c3_Err = flightui.TrackMap(flightui.MapAttrsFromAPIFlight(view.FlightNumber, view.Flight)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = flightui.TrackMap(mapAttrs).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

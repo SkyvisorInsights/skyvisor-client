@@ -154,7 +154,7 @@ func HomePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div data-skyvisor-map data-map-mode=\"globe\" data-latitude=\"28\" data-longitude=\"-20\" data-zoom=\"1.6\" class=\"min-h-[28rem] border-t border-border bg-[oklch(0.22_0.03_255)] lg:border-l lg:border-t-0\" aria-label=\"Interactive 3D globe with flight routes\"></div></div></div></section></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div data-skyvisor-map data-map-mode=\"globe\" data-map-scheme=\"dark\" data-latitude=\"28\" data-longitude=\"-20\" data-zoom=\"1.6\" class=\"min-h-[28rem] border-t border-border bg-[oklch(0.22_0.03_255)] lg:border-l lg:border-t-0\" aria-label=\"Interactive 3D globe with flight routes\"></div></div></div></section></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
