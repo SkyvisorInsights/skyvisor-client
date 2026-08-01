@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +25,20 @@ const (
 	// below it render without their ratios.
 	globeLowSampleThreshold = 20
 )
+
+// globeDemoEnabled reports whether the globe may fall back to demo data.
+//
+// Off unless SKYVISOR_GLOBE_DEMO is explicitly set, and only ever consulted
+// when there is no API session, so it can never mask or override real data.
+// The page is required to label itself when this is in effect.
+func globeDemoEnabled() bool {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("SKYVISOR_GLOBE_DEMO"))) {
+	case "1", "true", "yes", "on":
+		return true
+	default:
+		return false
+	}
+}
 
 // GlobePage renders the authenticated Global View.
 //
@@ -200,6 +215,17 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 	_ = group.Wait()
 	upstreamMS := time.Since(started).Milliseconds()
 
+	// Local development without an API session: stand in demo data so the globe
+	// can be worked on. Only when there is genuinely no session, and the view
+	// carries the flag so the page states plainly that it is not real.
+	demo := false
+	if !hasSession && globeDemoEnabled() {
+		demo = true
+		analytics, hasAnalytics = globeview.DemoAnalytics(), true
+		dashboard.Attention = globeview.DemoAttention()
+		hasOperations = true
+	}
+
 	lookup := globeview.CoordLookup(h.service.CoordLookup())
 
 	routes, routesUnresolved := globeview.BuildRoutes(analytics.Routes, lookup, filters.Risk)
@@ -212,6 +238,11 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 
 	markers := globeview.FleetMarkersFromWatches(dashboard.Watches, h.service.CoordLookup())
 	flights := globeview.FleetMarkerPoints(markers)
+	watched := len(dashboard.Watches)
+	if demo {
+		flights = globeview.DemoFlightPoints(lookup)
+		watched = globeview.DemoWatchCount()
+	}
 
 	envelope := globeview.Envelope{
 		GeneratedAt: time.Now().UTC(),
@@ -226,7 +257,7 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 			Routes:         len(routes.Features),
 			Hubs:           len(hubs.Features),
 			Flights:        len(flights.Features),
-			WatchedFlights: len(dashboard.Watches),
+			WatchedFlights: watched,
 			AtRisk:         globeview.CountRisk(routes, globeview.RiskRisk),
 			OnTimePercent:  analytics.Summary.OnTimePercent,
 			AvgDelay:       analytics.Summary.AvgDepartureDelayMinutes,
@@ -239,6 +270,8 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 
 	message := ""
 	switch {
+	case demo:
+		message = ""
 	case !hasSession:
 		message = "Your session has no API access. Sign in again to load live routes and flights."
 	case !hasAnalytics && !hasOperations:
@@ -247,6 +280,7 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 
 	return globeview.View{
 		Envelope:      envelope,
+		Demo:          demo,
 		Message:       message,
 		Attention:     globeview.AttentionRows(dashboard.Attention, h.service.CoordLookup()),
 		Ortho:         globeview.NewOrtho(globeCenterLon(routes), 18),
