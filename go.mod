@@ -53,7 +53,6 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/crypto v0.51.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect
@@ -64,5 +63,6 @@ require (
 
 require (
 	github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d
-	github.com/SkyvisorInsights/skyvisor-go-shared v0.2.0
+	github.com/SkyvisorInsights/skyvisor-go-shared v0.3.0
+	golang.org/x/sync v0.20.0
 )

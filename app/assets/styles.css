@@ -56,6 +56,24 @@
   --input: oklch(0.89 0.012 250);
   --ring: oklch(0.62 0.17 255);
   --radius: 0.7rem;
+
+  /* Map palette.
+     The basemap needs colours the UI token set does not have (ocean, graticule,
+     label halo), so they live here alongside the rest rather than pretending
+     --muted is a coastline. Resolved to sRGB at runtime by map/palette.js,
+     since MapLibre cannot parse oklch() or read custom properties. */
+  --map-ocean: oklch(0.87 0.045 240);
+  --map-land: oklch(0.975 0.005 250);
+  --map-boundary: oklch(0.71 0.035 250);
+  --map-graticule: oklch(0.81 0.03 243);
+  --map-arc-ok: var(--primary);
+  --map-arc-watch: oklch(0.68 0.16 75);
+  --map-arc-risk: var(--destructive);
+  --map-hub: oklch(0.5 0.14 250);
+  --map-flight: oklch(0.42 0.16 255);
+  --map-label: var(--foreground);
+  --map-label-halo: oklch(1 0 0);
+  --map-atmosphere: oklch(0.72 0.11 250);
 }
 
 .dark {
@@ -78,6 +96,21 @@
   --border: oklch(0.3 0.025 255);
   --input: oklch(0.3 0.025 255);
   --ring: oklch(0.7 0.15 250);
+
+  /* Dark map palette. Deep navy ocean with land lifted just enough to read,
+     matching the dark shell rather than the daylight look of a satellite tile. */
+  --map-ocean: oklch(0.14 0.026 255);
+  --map-land: oklch(0.225 0.022 255);
+  --map-boundary: oklch(0.34 0.022 255);
+  --map-graticule: oklch(0.24 0.02 255);
+  --map-arc-ok: var(--primary);
+  --map-arc-watch: oklch(0.75 0.16 75);
+  --map-arc-risk: var(--destructive);
+  --map-hub: oklch(0.82 0.09 250);
+  --map-flight: oklch(0.97 0.01 250);
+  --map-label: var(--foreground);
+  --map-label-halo: oklch(0.14 0.026 255);
+  --map-atmosphere: oklch(0.55 0.16 250);
 }
 
 html { overflow-x: clip; scroll-behavior: smooth; }
@@ -94,6 +127,28 @@ body { min-height: 100dvh; background: var(--background); color: var(--foregroun
 .flight-route { stroke-dasharray: 5 7; animation: route-drift 16s linear infinite; }
 .flight-progress-bar { transition: width 0.01ms linear; }
 .sky-fog { background: color-mix(in oklab, var(--card) 88%, transparent); backdrop-filter: blur(12px); }
+
+/* Callsign and hub chips, rendered as DOM markers on the globe. Markers rather
+   than a symbol layer avoids self-hosting ~1.5MB of SDF glyph PBFs and gives
+   the bordered pill the design calls for. */
+.skyvisor-map-chip {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.4rem; border-radius: 9999px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  line-height: 1.4; letter-spacing: 0.02em; white-space: nowrap; pointer-events: none;
+  color: var(--map-label);
+  background: color-mix(in oklab, var(--map-label-halo) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--map-boundary) 70%, transparent);
+  backdrop-filter: blur(3px);
+}
+.skyvisor-map-chip[data-chip-kind="flight"] {
+  color: var(--map-ocean); background: var(--map-flight); border-color: transparent;
+}
+
+/* The WebGL globe fades in only once it has actually drawn a frame, so the
+   server-rendered SVG is never replaced by an empty canvas. */
+[data-globe-canvas] { opacity: 0; transition: opacity 260ms ease; }
+[data-globe-canvas][data-map-rendered="true"] { opacity: 1; }
 .htmx-indicator { opacity: 0; transition: opacity 160ms ease; pointer-events: none; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
 

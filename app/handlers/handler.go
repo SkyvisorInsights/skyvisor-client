@@ -11,6 +11,7 @@ import (
 	"github.com/SkyvisorInsights/Aviation-tracker/app/services"
 	svg2 "github.com/SkyvisorInsights/Aviation-tracker/app/static/svg"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components/flightui"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/view/pages"
 	"github.com/a-h/templ"
 	"github.com/go-playground/form/v4"
@@ -25,6 +26,12 @@ import (
 
 const ASC = "ASC"
 const DESC = "DESC"
+
+// coordLookup hands the view layer a plain function for IATA -> position so
+// templ helpers never touch the database themselves.
+func (h *Handler) coordLookup() flightui.CoordLookup {
+	return flightui.CoordLookup(h.service.CoordLookup())
+}
 
 type contextKey string
 
@@ -85,8 +92,21 @@ func HandleError(err error, message string) {
 //	json.NewEncoder(w).Encode(err)
 //}
 
-func (h *Handler) CreateLayout(_ http.ResponseWriter, r *http.Request, title string,
+func (h *Handler) CreateLayout(w http.ResponseWriter, r *http.Request, title string,
 	data templ.Component) templ.Component {
+	return h.createLayoutVariant(w, r, title, data, models.LayoutDefault)
+}
+
+// CreateCanvasLayout renders a page in the full-viewport shell: the navbar
+// overlays the content and the footer is dropped, so a globe can fill the
+// screen without the page scrolling.
+func (h *Handler) CreateCanvasLayout(w http.ResponseWriter, r *http.Request, title string,
+	data templ.Component) templ.Component {
+	return h.createLayoutVariant(w, r, title, data, models.LayoutCanvas)
+}
+
+func (h *Handler) createLayoutVariant(_ http.ResponseWriter, r *http.Request, title string,
+	data templ.Component, variant models.LayoutVariant) templ.Component {
 	var user *models.UserSession
 	userCtx := r.Context().Value(models.CtxKeyAuthUser)
 	if userCtx != nil {
@@ -110,6 +130,7 @@ func (h *Handler) CreateLayout(_ http.ResponseWriter, r *http.Request, title str
 	} else {
 		nav = []models.NavItem{
 			{Path: "/dashboard", Label: "Dashboard", Icon: svg2.HomeIcon()},
+			{Path: "/globe", Label: "Global view", Icon: svg2.GlobeIcon()},
 			{Path: "/trips", Label: "Trips", Icon: svg2.PaperAirplaneIcon()},
 			{Label: "Monitor", Icon: svg2.PaperAirplaneIcon(), SubItems: []models.NavItem{
 				{Path: "/track", Label: "Flight lookup"},
@@ -143,6 +164,7 @@ func (h *Handler) CreateLayout(_ http.ResponseWriter, r *http.Request, title str
 		ActiveNav: r.URL.Path,
 		Content:   data,
 		CSRFToken: csrf.Token(r),
+		Variant:   variant,
 	}
 
 	return pages.LayoutPage(l)

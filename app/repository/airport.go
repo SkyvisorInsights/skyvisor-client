@@ -2,10 +2,15 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+// ErrNoDatabase is returned when a repository was constructed without a pool,
+// which happens in tests and in degraded boots.
+var ErrNoDatabase = errors.New("repository: no database pool configured")
 
 type AirportRepository struct {
 	pgpool *pgxpool.Pool
@@ -141,6 +146,57 @@ func (r *AirportRepository) GetSum(ctx context.Context) (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+// GetAirportCoordinates returns every airport that has a usable IATA code and a
+// plausible position, for the in-process geo cache.
+//
+// The latitude/longitude columns are DEFAULT 0.0 (see db/migrations/4_airport.sql),
+// so rows that were imported without a position look like Null Island. Those are
+// excluded here rather than at the call site: a route drawn to 0,0 lands in the
+// Gulf of Guinea and reads as real data.
+func (r *AirportRepository) GetAirportCoordinates(ctx context.Context) ([]models.AirportCoord, error) {
+	// Guard the nil pool explicitly: callers treat an error as "coordinates
+	// unavailable" and degrade honestly, whereas a nil-pool panic takes the
+	// request down.
+	if r == nil || r.pgpool == nil {
+		return nil, ErrNoDatabase
+	}
+
+	rows, err := r.pgpool.Query(ctx, `SELECT Upper(Btrim(a.iata_code))            AS iata,
+                                             Upper(Btrim(Coalesce(a.icao_code, ''))) AS icao,
+                                             a.latitude,
+                                             a.longitude,
+                                             Coalesce(a.airport_name, '')         AS name,
+                                             Upper(Coalesce(a.city_iata_code, '')) AS city_iata,
+                                             Upper(Coalesce(a.country_iso2, ''))  AS country_iso2,
+                                             Coalesce(a.timezone, '')             AS timezone
+                                      FROM   airport a
+                                      WHERE  a.iata_code IS NOT NULL
+                                             AND Btrim(a.iata_code) <> ''
+                                             AND ( a.latitude <> 0 OR a.longitude <> 0 )
+                                             AND a.latitude BETWEEN -90 AND 90
+                                             AND a.longitude BETWEEN -180 AND 180`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	coords := make([]models.AirportCoord, 0, 8192)
+	for rows.Next() {
+		var c models.AirportCoord
+		if err := rows.Scan(
+			&c.IATA, &c.ICAO, &c.Lat, &c.Lon,
+			&c.Name, &c.CityIATA, &c.CountryISO2, &c.Timezone,
+		); err != nil {
+			return nil, err
+		}
+		coords = append(coords, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return coords, nil
 }
 
 func (r *AirportRepository) GetAirportsLocation(ctx context.Context) ([]models.Airport, error) {

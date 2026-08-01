@@ -1,0 +1,61 @@
+package globe
+
+import "fmt"
+
+// StatsRail is the "Main Statistics" panel.
+//
+// Every number is paired with a "known" flag so a missing upstream renders an
+// em dash rather than a confident zero.
+templ StatsRail(v View) {
+	<aside
+		id="globe-stats"
+		class="pointer-events-auto w-full max-w-[15rem] rounded-xl border border-border/60 bg-card/85 p-4 backdrop-blur-md sm:max-w-[16rem]"
+		aria-labelledby="globe-stats-heading"
+		data-motion-enter
+	>
+		<h2 id="globe-stats-heading" class="text-lg font-semibold leading-tight">Main<br/>statistics</h2>
+		<dl class="mt-4 space-y-4">
+			@metric("Routes mapped", Count(v.Envelope.Stats.Routes, v.Envelope.Stats.HasAnalytics), v.Envelope.Stats.Routes, v.Envelope.Stats.HasAnalytics)
+			@metric("Airports", Count(v.Envelope.Stats.Hubs, v.Envelope.Stats.HasAnalytics), v.Envelope.Stats.Hubs, v.Envelope.Stats.HasAnalytics)
+			@metric("Routes at risk", Count(v.Envelope.Stats.AtRisk, v.Envelope.Stats.HasAnalytics), v.Envelope.Stats.AtRisk, v.Envelope.Stats.HasAnalytics)
+			<div>
+				<dt class="text-xs text-muted-foreground">On time</dt>
+				<dd class="mt-0.5 font-mono text-xl font-semibold tabular-nums">
+					{ Percent(v.Envelope.Stats.OnTimePercent, v.Envelope.Stats.HasAnalytics) }
+				</dd>
+			</div>
+			<div>
+				<dt class="text-xs text-muted-foreground">Average delay</dt>
+				<dd class="mt-0.5 font-mono text-xl font-semibold tabular-nums">
+					{ Minutes(v.Envelope.Stats.AvgDelay, v.Envelope.Stats.HasAnalytics) }
+				</dd>
+			</div>
+		</dl>
+		if !v.Envelope.Stats.HasAnalytics {
+			<p class="mt-4 text-[11px] leading-snug text-muted-foreground">
+				Analytics are unavailable right now, so route and airport figures are not shown.
+			</p>
+		}
+		if note := UnresolvedNote(v.Envelope.Unresolved); note != "" {
+			<p class="mt-4 border-t border-border/60 pt-3 text-[11px] leading-snug text-muted-foreground">{ note }</p>
+		}
+		if v.Envelope.Stats.SampleSize > 0 {
+			<p class="mt-3 text-[11px] text-muted-foreground">
+				{ fmt.Sprintf("Sample: %d flights", v.Envelope.Stats.SampleSize) }
+			</p>
+		}
+	</aside>
+}
+
+// metric animates its value only when the number is real; an em dash must not
+// count up from zero.
+templ metric(label string, display string, value int, known bool) {
+	<div>
+		<dt class="text-xs text-muted-foreground">{ label }</dt>
+		if known {
+			<dd class="mt-0.5 font-mono text-2xl font-semibold tabular-nums" data-motion-counter={ fmt.Sprint(value) }>{ display }</dd>
+		} else {
+			<dd class="mt-0.5 font-mono text-2xl font-semibold tabular-nums text-muted-foreground">{ display }</dd>
+		}
+	</div>
+}

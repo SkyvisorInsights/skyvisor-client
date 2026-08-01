@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
@@ -32,6 +33,26 @@ import (
 
 //go:embed static
 var staticFS embed.FS
+
+// staticCacheHeaders caches content-addressed assets aggressively and everything
+// else conservatively. Only files under /static/geo/ carry a version in their
+// name (world-land-v1.json), so only those are safe to mark immutable; the JS
+// and CSS bundles keep stable names and must stay revalidated.
+func staticCacheHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/static/geo/") {
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			// The JS and CSS bundles keep stable filenames, so they must be
+			// revalidated on every request rather than served blind from cache.
+			// max-age here would pin users to stale JS until it expired — and
+			// makes local changes invisible for the same reason.
+			// no-cache still allows 304s, so unchanged bundles cost one HEAD.
+			w.Header().Set("Cache-Control", "no-cache")
+		}
+		next.ServeHTTP(w, r)
+	})
+}
 
 func setupBusinessComponents(pool *pgxpool.Pool, redisClient *redis.Client, validate *validator.Validate,
 	sessionSecret []byte, cookieSecure bool, oidcClient *auth.Client,
@@ -61,6 +82,20 @@ func setupBusinessComponents(pool *pgxpool.Pool, redisClient *redis.Client, vali
 
 	// Service
 	service := services.NewService(airlineRepo, airportRepo, locationRepo, flightsRepo, authRepo, oidcClient, apiClient)
+
+	// Load the airport coordinate table off the boot path. Lookups arriving
+	// before this finishes trigger their own lazy load via singleflight, so a
+	// slow database delays the first map rather than the whole server.
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if err := service.Geo().Warm(ctx); err != nil {
+			slog.Warn("airport coordinate warm-up failed", "error", err)
+			return
+		}
+		count, loadedAt := service.Geo().Stats()
+		slog.Info("airport coordinates loaded", "airports", count, "loaded_at", loadedAt)
+	}()
 
 	// Handler
 	handler := handlers.NewHandler(service, sessionStore, pool, redisClient, oidcClient)
@@ -108,8 +143,20 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		_, _ = w.Write([]byte(`{"status":"ready"}`))
 	})
 
-	// Static files
-	r.Handle("/static/*", http.FileServer(http.FS(staticFS)))
+	// Static files.
+	//
+	// Compression is scoped to this subtree rather than applied globally: the
+	// /events SSE stream must not be buffered by a compressor. The basemap
+	// GeoJSON is ~448 KB raw and ~98 KB gzipped, so this is the difference
+	// between a fast and a sluggish first globe render.
+	r.Group(func(static chi.Router) {
+		static.Use(chimiddleware.Compress(5,
+			"application/javascript", "text/javascript", "text/css",
+			"application/json", "image/svg+xml",
+		))
+		static.Use(staticCacheHeaders)
+		static.Handle("/static/*", http.FileServer(http.FS(staticFS)))
+	})
 	if scriptFS, err := fs.Sub(thinkingorbs.ScriptFS, "orb"); err != nil {
 		slog.Error("thinking orbs script fs", "error", err)
 	} else {
@@ -159,6 +206,8 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		auth.Post("/logout", handler(h.Logout))
 		auth.Get("/welcome", handler(h.WelcomePage))
 		auth.Get("/dashboard", handler(h.DashboardPage))
+		auth.Get("/globe", handler(h.GlobePage))
+		auth.Get("/globe/data", handler(h.GlobeData))
 		auth.Get("/settings", handler(h.SettingsPage))
 		auth.Post("/settings/alerts", handler(h.SettingsAlerts))
 		auth.Post("/settings/tokens", handler(h.SettingsTokensCreate))

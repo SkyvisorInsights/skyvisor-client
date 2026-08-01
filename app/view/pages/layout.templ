@@ -26,13 +26,22 @@ templ LayoutPage(l models.LayoutTempl) {
 		</head>
 		<body hx-boost="true" x-data="appShell" lang="en">
 			<a href="#main-content" class="sr-only z-[60] rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
-			<div class="flex min-h-screen flex-col" id="contents">
-				@components.NavbarComponent(l.Nav, l.User, l.ActiveNav, l.CSRFToken)
-				<main class="flex-1" id="main-content">
-					@l.Content
-				</main>
-				@components.FooterComponent()
-			</div>
+			if l.Variant == models.LayoutCanvas {
+				<div class="relative flex h-[100dvh] flex-col overflow-hidden" id="contents">
+					@components.NavbarComponent(l.Nav, l.User, l.ActiveNav, l.CSRFToken)
+					<main class="relative min-h-0 flex-1 overflow-hidden" id="main-content">
+						@l.Content
+					</main>
+				</div>
+			} else {
+				<div class="flex min-h-screen flex-col" id="contents">
+					@components.NavbarComponent(l.Nav, l.User, l.ActiveNav, l.CSRFToken)
+					<main class="flex-1" id="main-content">
+						@l.Content
+					</main>
+					@components.FooterComponent()
+				</div>
+			}
 		</body>
 	</html>
 }
