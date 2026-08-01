@@ -129,8 +129,12 @@ export function initGlobeLive(element, options = {}) {
   // Reconcile. Paused while the tab is hidden — polling a globe nobody is
   // looking at spends the user's battery and our rate limit for nothing.
   let timer = null
-  const reconcile = async () => {
-    if (disposed || document.hidden) return
+  // force is used for the one-off reconciles (page load, tab becoming visible).
+  // Only the recurring poll respects document.hidden — a single request is not
+  // "polling a globe nobody is looking at", and skipping it would leave the
+  // latency and freshness chips blank until the first interval elapsed.
+  const reconcile = async ({ force = false } = {}) => {
+    if (disposed || (document.hidden && !force)) return
     try {
       const response = await fetch(options.dataUrl || '/globe/data', {
         credentials: 'same-origin',
@@ -152,7 +156,7 @@ export function initGlobeLive(element, options = {}) {
 
   const startTimer = () => {
     if (timer !== null) return
-    timer = window.setInterval(reconcile, RECONCILE_MS)
+    timer = window.setInterval(() => reconcile(), RECONCILE_MS)
   }
   const stopTimer = () => {
     if (timer === null) return
@@ -160,9 +164,24 @@ export function initGlobeLive(element, options = {}) {
     timer = null
   }
 
-  const onVisibility = () => (document.hidden ? stopTimer() : startTimer())
+  const onVisibility = () => {
+    if (document.hidden) {
+      stopTimer()
+      return
+    }
+    startTimer()
+    // Catch up immediately rather than showing minute-old positions until the
+    // next tick.
+    reconcile({ force: true })
+  }
   document.addEventListener('visibilitychange', onVisibility)
   if (!document.hidden) startTimer()
+
+  // Reconcile once immediately. The page already has the bootstrap envelope, so
+  // this is not about the data — it is the only way the latency and freshness
+  // chips get a real measurement, and waiting a full interval would leave them
+  // blank for a minute after load.
+  reconcile({ force: true })
 
   return () => {
     disposed = true
