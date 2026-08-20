@@ -1,10 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
-
-	"context"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
@@ -24,8 +23,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const ASC = "ASC"
-const DESC = "DESC"
+const (
+	ASC  = "ASC"
+	DESC = "DESC"
+)
 
 // coordLookup hands the view layer a plain function for IATA -> position so
 // templ helpers never touch the database themselves.
@@ -49,7 +50,8 @@ type Handler struct {
 }
 
 func NewHandler(s *services.Service, sessions *sessions.CookieStore,
-	pool *pgxpool.Pool, redisClient *redis.Client, oidc *auth.Client) *Handler {
+	pool *pgxpool.Pool, redisClient *redis.Client, oidc *auth.Client,
+) *Handler {
 	decoder := form.NewDecoder()
 	validate := validator.New()
 	translator, _ := ut.New(en.New(), en.New()).GetTranslator("en")
@@ -93,7 +95,8 @@ func HandleError(err error, message string) {
 //}
 
 func (h *Handler) CreateLayout(w http.ResponseWriter, r *http.Request, title string,
-	data templ.Component) templ.Component {
+	data templ.Component,
+) templ.Component {
 	return h.createLayoutVariant(w, r, title, data, models.LayoutDefault)
 }
 
@@ -101,12 +104,14 @@ func (h *Handler) CreateLayout(w http.ResponseWriter, r *http.Request, title str
 // overlays the content and the footer is dropped, so a globe can fill the
 // screen without the page scrolling.
 func (h *Handler) CreateCanvasLayout(w http.ResponseWriter, r *http.Request, title string,
-	data templ.Component) templ.Component {
+	data templ.Component,
+) templ.Component {
 	return h.createLayoutVariant(w, r, title, data, models.LayoutCanvas)
 }
 
 func (h *Handler) createLayoutVariant(_ http.ResponseWriter, r *http.Request, title string,
-	data templ.Component, variant models.LayoutVariant) templ.Component {
+	data templ.Component, variant models.LayoutVariant,
+) templ.Component {
 	var user *models.UserSession
 	userCtx := r.Context().Value(models.CtxKeyAuthUser)
 	if userCtx != nil {

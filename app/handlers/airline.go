@@ -1,11 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
-
-	"context"
 
 	httperror "github.com/SkyvisorInsights/Aviation-tracker/app/errors"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
@@ -103,7 +102,6 @@ func (h *Handler) renderAirlineTable(w http.ResponseWriter, r *http.Request) (te
 	}
 
 	page, al, err := h.getAirline(w, r)
-
 	if err != nil {
 		HandleError(err, "Error fetching airlines")
 		httperror.ErrNotFound.WriteError(w)
@@ -117,7 +115,6 @@ func (h *Handler) renderAirlineTable(w http.ResponseWriter, r *http.Request) (te
 	}
 
 	lastPage, err := h.service.GetAllAirline()
-
 	if err != nil {
 		HandleError(err, "error fetching total airline")
 		httperror.ErrNotFound.WriteError(w)
@@ -144,7 +141,7 @@ func (h *Handler) renderAirlineTable(w http.ResponseWriter, r *http.Request) (te
 }
 
 func (h *Handler) AirlineMainPage(w http.ResponseWriter, r *http.Request) error {
-	var table, err = h.renderAirlineTable(w, r)
+	table, err := h.renderAirlineTable(w, r)
 	if err != nil {
 		HandleError(err, "Error rendering airline table")
 		httperror.ErrInternalServer.WriteError(w)

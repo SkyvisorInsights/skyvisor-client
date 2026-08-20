@@ -109,6 +109,7 @@ func providerLabel(provider string) string {
 	}
 	return provider
 }
+
 func valueOr(value, fallback string) string {
 	if strings.TrimSpace(value) == "" {
 		return fallback

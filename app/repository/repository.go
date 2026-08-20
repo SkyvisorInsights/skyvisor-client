@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"log"
-
 	"context"
+	"log"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,7 +23,8 @@ func handleError(err error, message string) {
 }
 
 func (r *AirlineRepository) getAirline(ctx context.Context, query string,
-	args ...interface{}) ([]models.Airline, error) {
+	args ...interface{},
+) ([]models.Airline, error) {
 	var al []models.Airline
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -40,7 +40,6 @@ func (r *AirlineRepository) getAirline(ctx context.Context, query string,
 			&a.FleetSize, &a.CallSign, &a.HubCode, &a.Status,
 			&a.Type, &a.CountryName,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +54,8 @@ func (r *AirlineRepository) getAirline(ctx context.Context, query string,
 }
 
 func (r *AirlineRepository) GetAirlinesExample(ctx context.Context, page,
-	pageSize int, orderBy, sortBy, name string) ([]models.Airline, error) {
+	pageSize int, orderBy, sortBy, name string,
+) ([]models.Airline, error) {
 	offset := (page - 1) * pageSize
 	query := `select al.id, al.airline_name, al.date_founded, al.fleet_average_age, al.fleet_size,
 						al.callsign, al.hub_code, al.status, al.type, al.country_name
@@ -125,7 +125,6 @@ func (r *AirlineRepository) GetAirlinesLocationsExample(ctx context.Context) ([]
 			&a.FleetSize, &a.CallSign, &a.HubCode, &a.Status, &a.Type, &a.CountryName,
 			&a.CityName, &a.AirportName, &a.Timezone, &a.Latitude, &a.Longitude,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -188,7 +187,6 @@ func (r *AirlineRepository) GetAirlineByNameExample(ctx context.Context, airline
 		&al.Latitude,
 		&al.Longitude,
 	)
-
 	if err != nil {
 		handleError(err, "Error scanning airlines")
 		return models.Airline{}, err

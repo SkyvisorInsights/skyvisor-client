@@ -17,7 +17,8 @@ func NewLocationsRepository(db *pgxpool.Pool) *LocationsRepository {
 
 // Country
 func (r *LocationsRepository) getCountryData(ctx context.Context, query string,
-	args ...interface{}) ([]models.Country, error) {
+	args ...interface{},
+) ([]models.Country, error) {
 	var country []models.Country
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -40,7 +41,6 @@ func (r *LocationsRepository) getCountryData(ctx context.Context, query string,
 			&c.Latitude,
 			&c.Longitude,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,8 @@ func (r *LocationsRepository) getCountryData(ctx context.Context, query string,
 }
 
 func (r *LocationsRepository) GetCountry(ctx context.Context, page, pageSize int,
-	orderBy, sortBy, countryName, capital, continent, currencyCode string) ([]models.Country, error) {
+	orderBy, sortBy, countryName, capital, continent, currencyCode string,
+) ([]models.Country, error) {
 	offset := (page - 1) * pageSize
 	query := `SELECT
 			    cou.country_name,
@@ -201,7 +202,6 @@ func (r *LocationsRepository) GetCountryByName(ctx context.Context, name string)
 		&c.Latitude,
 		&c.Longitude,
 	)
-
 	if err != nil {
 		return models.Country{}, err
 	}
@@ -212,7 +212,8 @@ func (r *LocationsRepository) GetCountryByName(ctx context.Context, name string)
 // City
 
 func (r *LocationsRepository) getCityData(ctx context.Context, query string,
-	args ...interface{}) ([]models.City, error) {
+	args ...interface{},
+) ([]models.City, error) {
 	var city []models.City
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -227,7 +228,6 @@ func (r *LocationsRepository) getCityData(ctx context.Context, query string,
 			&c.Continent, &c.CountryName, &c.CurrencyName,
 			&c.PhonePrefix, &c.Latitude, &c.Longitude,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -332,7 +332,8 @@ func (r *LocationsRepository) GetCitySum(ctx context.Context) (int, error) {
 }
 
 func (r *LocationsRepository) GetCityByName(ctx context.Context, page, pageSize int,
-	name string, orderBy, sortBy string) ([]models.City, error) {
+	name string, orderBy, sortBy string,
+) ([]models.City, error) {
 	offset := (page - 1) * pageSize
 	query := `SELECT ct.id,
               ct.city_name, ct.timezone, ct.gmt,
@@ -397,7 +398,6 @@ func (r *LocationsRepository) GetCityByID(ctx context.Context, cityID int) (mode
 		&c.Continent, &c.CountryName, &c.CurrencyName,
 		&c.PhonePrefix, &c.Latitude, &c.Longitude,
 	)
-
 	if err != nil {
 		return models.City{}, err
 	}

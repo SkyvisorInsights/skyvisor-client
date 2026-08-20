@@ -100,9 +100,8 @@ func fetchAviationStackData(endpoint string, queryParams ...string) ([]byte, err
 		return nil, errors.New("something is not ok")
 	}
 
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	body, err := io.ReadAll(io.LimitReader(response.Body, 16<<20))
-
 	if err != nil {
 		return nil, errors.New("failed to read response body")
 	}
@@ -113,7 +112,6 @@ func fetchAviationStackData(endpoint string, queryParams ...string) ([]byte, err
 func FetchAndInsertCityData(conn *pgxpool.Pool) error {
 	res := new(structs.CityAPIData)
 	data, err := getData("cities", "limit=100", "./api/data/cities.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -129,7 +127,8 @@ func FetchAndInsertCityData(conn *pgxpool.Pool) error {
 
 		context.Background(),
 		pgx.Identifier{"city"},
-		[]string{"gmt", "city_id", "iata_code", "country_iso2", "geoname_id",
+		[]string{
+			"gmt", "city_id", "iata_code", "country_iso2", "geoname_id",
 			"latitude", "longitude", "city_name", "timezone", "created_at",
 		},
 		pgx.CopyFromSlice(len(res.Data), func(i int) ([]interface{}, error) {
@@ -159,7 +158,6 @@ func FetchAndInsertCityData(conn *pgxpool.Pool) error {
 func FetchAndInsertCountryData(conn *pgxpool.Pool) error {
 	res := new(structs.CountryAPIData)
 	data, err := getData("countries", "limit=1000000", "./api/data/countries.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -174,7 +172,8 @@ func FetchAndInsertCountryData(conn *pgxpool.Pool) error {
 
 		context.Background(),
 		pgx.Identifier{"country"},
-		[]string{"country_name", "country_iso2", "country_iso3", "country_iso_numeric", "population",
+		[]string{
+			"country_name", "country_iso2", "country_iso3", "country_iso_numeric", "population",
 			"capital", "continent", "currency_name", "currency_code", "fips_code",
 			"phone_prefix", "created_at",
 		},
@@ -207,7 +206,6 @@ func FetchAndInsertCountryData(conn *pgxpool.Pool) error {
 func FetchAndInsertAirportData(conn *pgxpool.Pool) error {
 	res := new(structs.AirportAPIData)
 	data, err := getData("airports", "limit=1000000", "./api/data/airports.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -222,7 +220,8 @@ func FetchAndInsertAirportData(conn *pgxpool.Pool) error {
 
 		context.Background(),
 		pgx.Identifier{"airport"},
-		[]string{"gmt", "airport_id", "iata_code", "city_iata_code", "icao_code",
+		[]string{
+			"gmt", "airport_id", "iata_code", "city_iata_code", "icao_code",
 			"country_iso2", "geoname_id", "latitude", "longitude", "airport_name",
 			"country_name", "phone_number", "timezone", "created_at",
 		},
@@ -247,7 +246,6 @@ func FetchAndInsertAirportData(conn *pgxpool.Pool) error {
 func FetchAndInsertAirplaneData(conn *pgxpool.Pool) error {
 	res := new(structs.AirplaneAPIData)
 	data, err := getData("airplanes", "limit=1000000", "./api/data/airplane.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -263,7 +261,8 @@ func FetchAndInsertAirplaneData(conn *pgxpool.Pool) error {
 
 		context.Background(),
 		pgx.Identifier{"airplane"},
-		[]string{"iata_type", "airplane_id", "airline_iata_code", "iata_code_long", "iata_code_short",
+		[]string{
+			"iata_type", "airplane_id", "airline_iata_code", "iata_code_long", "iata_code_short",
 			"airline_icao_code", "construction_number", "delivery_date", "engines_count", "engines_type",
 			"first_flight_date", "icao_code_hex", "line_number", "model_code", "registration_number",
 			"test_registration_number", "plane_age", "plane_class", "model_name", "plane_owner", "plane_series",
@@ -312,7 +311,6 @@ func FetchAndInsertAirplaneData(conn *pgxpool.Pool) error {
 func FetchAndInsertTaxData(conn *pgxpool.Pool) error {
 	res := new(structs.TaxAPIData)
 	data, err := getData("taxes", "limit=1000000", "./api/data/tax.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -347,7 +345,6 @@ func FetchAndInsertTaxData(conn *pgxpool.Pool) error {
 func FetchAndInsertAircraftData(conn *pgxpool.Pool) error {
 	res := new(structs.AircraftAPIData)
 	data, err := getData("aircraft_types", "limit=1000000", "./api/data/aircraft.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -399,7 +396,8 @@ func FetchAndInsertAirlineData(conn *pgxpool.Pool) error {
 	if _, err = conn.CopyFrom(
 		context.Background(),
 		pgx.Identifier{"airline"},
-		[]string{"fleet_average_age", "airline_id", "callsign", "hub_code", "iata_code", "icao_code", "country_iso2",
+		[]string{
+			"fleet_average_age", "airline_id", "callsign", "hub_code", "iata_code", "icao_code", "country_iso2",
 			"date_founded", "iata_prefix_accounting", "airline_name", "country_name", "fleet_size", "status", "type",
 			"created_at",
 		},
@@ -434,7 +432,6 @@ func FetchAndInsertAirlineData(conn *pgxpool.Pool) error {
 func FetchAndInsertFlightData(conn *pgxpool.Pool) error {
 	res := new(structs.FlightAPIData)
 	data, err := getData("flights", "limit=1000000", "./api/data/flights.json")
-
 	if err != nil {
 		handleError(err, "error fetching data")
 		return err
@@ -449,7 +446,8 @@ func FetchAndInsertFlightData(conn *pgxpool.Pool) error {
 	if _, err = conn.CopyFrom(
 		context.Background(),
 		pgx.Identifier{"flights"},
-		[]string{"id", "flight_date", "flight_status", "departure_airport", "departure_timezone", "departure_iata",
+		[]string{
+			"id", "flight_date", "flight_status", "departure_airport", "departure_timezone", "departure_iata",
 			"departure_icao", "departure_terminal", "departure_gate", "departure_delay", "departure_scheduled",
 			"departure_estimated", "departure_actual", "departure_estimated_runway", "departure_actual_runway",
 			"arrival_airport", "arrival_timezone", "arrival_iata", "arrival_icao", "arrival_terminal",

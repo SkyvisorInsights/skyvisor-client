@@ -17,11 +17,14 @@ func NewFlightsRepository(db *pgxpool.Pool) *FlightsRepository {
 	return &FlightsRepository{pgpool: db}
 }
 
-const millis = 1000
-const minutes = 60
+const (
+	millis  = 1000
+	minutes = 60
+)
 
 func (r *FlightsRepository) getFlightsData(ctx context.Context, query string,
-	args ...interface{}) ([]models.LiveFlights, error) {
+	args ...interface{},
+) ([]models.LiveFlights, error) {
 	var lf []models.LiveFlights
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -80,7 +83,8 @@ func (r *FlightsRepository) getFlightsData(ctx context.Context, query string,
 }
 
 func (r *FlightsRepository) getFlightsLocationsData(ctx context.Context, query string,
-	args ...interface{}) ([]models.LiveFlights, error) {
+	args ...interface{},
+) ([]models.LiveFlights, error) {
 	var lf []models.LiveFlights
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -148,7 +152,8 @@ func (r *FlightsRepository) getFlightsLocationsData(ctx context.Context, query s
 }
 
 func (r *FlightsRepository) GetAllFlights(ctx context.Context,
-	page, pageSize int, orderBy, sortBy string) ([]models.LiveFlights, error) {
+	page, pageSize int, orderBy, sortBy string,
+) ([]models.LiveFlights, error) {
 	query := `SELECT DISTINCT ON (f.flight_number)
 							       f.flight_number,
 							       f.flight_date,
@@ -392,7 +397,8 @@ func (r *FlightsRepository) GetAllFlightsLocation(ctx context.Context) ([]models
 }
 
 func (r *FlightsRepository) GetAllFlightsByStatus(ctx context.Context,
-	page, pageSize int, orderBy, sortBy, flightNumber, flightStatus string) ([]models.LiveFlights, error) {
+	page, pageSize int, orderBy, sortBy, flightNumber, flightStatus string,
+) ([]models.LiveFlights, error) {
 	query := `select
 							       f.flight_number,
 							       f.flight_date,
@@ -524,7 +530,8 @@ func (r *FlightsRepository) GetAllFlightsLocationsByStatus(ctx context.Context, 
 }
 
 func (r *FlightsRepository) getLiveFlightsData(ctx context.Context, query string,
-	args ...interface{}) ([]models.LiveFlights, error) {
+	args ...interface{},
+) ([]models.LiveFlights, error) {
 	var lf []models.LiveFlights
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -584,7 +591,8 @@ func (r *FlightsRepository) getLiveFlightsData(ctx context.Context, query string
 }
 
 func (r *FlightsRepository) GetLiveFlights(ctx context.Context,
-	page, pageSize int, orderBy, sortBy string) ([]models.LiveFlights, error) {
+	page, pageSize int, orderBy, sortBy string,
+) ([]models.LiveFlights, error) {
 	query := `select
 							       f.flight_number,
 							       f.flight_status,

@@ -32,8 +32,8 @@ func NewService(
 	flightRepo *repository.FlightsRepository,
 	accountRepo *repository.AccountRepository,
 	oidc *auth.Client,
-	api *apiclient.Client) *Service {
-
+	api *apiclient.Client,
+) *Service {
 	return &Service{
 		airlineRepo:  airlineRepo,
 		airportRepo:  airportRepo,

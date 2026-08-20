@@ -1,18 +1,18 @@
 package services
 
 import (
-	"math"
-
 	"context"
+	"math"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 )
 
 func (h *Service) GetAirports(ctx context.Context,
-	page, pageSize int, orderBy, sortBy string) ([]models.Airport, error) {
-
+	page, pageSize int, orderBy, sortBy string,
+) ([]models.Airport, error) {
 	return h.airportRepo.GetAirports(ctx, page, pageSize, orderBy, sortBy)
 }
+
 func (h *Service) GetAirportsLocation() ([]models.Airport, error) {
 	a, err := h.airportRepo.GetAirportsLocation(context.Background())
 	if err != nil {
@@ -34,8 +34,8 @@ func (h *Service) GetAllAirports() (int, error) {
 }
 
 func (h *Service) GetAirportByName(ctx context.Context, page, pageSize int,
-	orderBy, sortBy, airportName, countryName, gmt string) ([]models.Airport, error) {
-
+	orderBy, sortBy, airportName, countryName, gmt string,
+) ([]models.Airport, error) {
 	return h.airportRepo.GetAirportByName(ctx, page, pageSize, orderBy, sortBy, airportName, countryName, gmt)
 }
 

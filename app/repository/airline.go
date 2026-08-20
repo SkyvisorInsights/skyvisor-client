@@ -14,7 +14,8 @@ func HandleError(err error, message string) {
 }
 
 func (r *AirlineRepository) getAirlineData(ctx context.Context, query string,
-	args ...interface{}) ([]models.Airline, error) {
+	args ...interface{},
+) ([]models.Airline, error) {
 	var al []models.Airline
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -30,7 +31,6 @@ func (r *AirlineRepository) getAirlineData(ctx context.Context, query string,
 			&a.FleetSize, &a.CallSign, &a.HubCode, &a.Status,
 			&a.Type, &a.CountryName,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -46,7 +46,8 @@ func (r *AirlineRepository) getAirlineData(ctx context.Context, query string,
 
 func (r *AirlineRepository) GetAirlines(ctx context.Context, page,
 	pageSize int, orderBy, sortBy, name, callSign, hubCode,
-	countryName string) ([]models.Airline, error) {
+	countryName string,
+) ([]models.Airline, error) {
 	offset := (page - 1) * pageSize
 	query := `select al.id, al.airline_name, al.date_founded, al.fleet_average_age, al.fleet_size,
 						al.callsign, al.hub_code, al.status, al.type, al.country_name
@@ -121,7 +122,6 @@ func (r *AirlineRepository) GetAirlinesLocations(ctx context.Context) ([]models.
 			&a.FleetSize, &a.CallSign, &a.HubCode, &a.Status, &a.Type, &a.CountryName,
 			&a.CityName, &a.AirportName, &a.Timezone, &a.Latitude, &a.Longitude,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +184,6 @@ func (r *AirlineRepository) GetAirlineByName(ctx context.Context, airlineName st
 		&al.Latitude,
 		&al.Longitude,
 	)
-
 	if err != nil {
 		HandleError(err, "Error scanning airlines")
 		return models.Airline{}, err
@@ -195,7 +194,8 @@ func (r *AirlineRepository) GetAirlineByName(ctx context.Context, airlineName st
 // Aircraft
 
 func (r *AirlineRepository) getAircraftData(ctx context.Context, query string,
-	args ...interface{}) ([]models.Aircraft, error) {
+	args ...interface{},
+) ([]models.Aircraft, error) {
 	var aircraft []models.Aircraft
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -212,7 +212,6 @@ func (r *AirlineRepository) getAircraftData(ctx context.Context, query string,
 			&a.ModelCode, &a.PlaneAge, &a.PlaneClass, &a.PlaneOwner, &a.PlaneSeries,
 			&a.PlaneStatus,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -227,8 +226,8 @@ func (r *AirlineRepository) getAircraftData(ctx context.Context, query string,
 }
 
 func (r *AirlineRepository) GetAircraft(ctx context.Context, page, pageSize int, aircraftName,
-	orderBy, sortBy, typeEngine, modelCode, planeOwner string) ([]models.Aircraft, error) {
-
+	orderBy, sortBy, typeEngine, modelCode, planeOwner string,
+) ([]models.Aircraft, error) {
 	offset := (page - 1) * pageSize
 	query := `SELECT ac.id, ac.aircraft_name, ap.model_name, ap.construction_number,
 											ap.engines_count, ap.engines_type, ap.first_flight_date, ap.line_number,
@@ -275,7 +274,6 @@ func (r *AirlineRepository) GetAircraft(ctx context.Context, page, pageSize int,
 
 	return r.getAircraftData(ctx, query, aircraftName, orderBy, sortBy, offset,
 		pageSize, typeEngine, modelCode, planeOwner)
-
 }
 
 func (r *AirlineRepository) GetAircraftSum(ctx context.Context) (int, error) {
@@ -294,7 +292,8 @@ func (r *AirlineRepository) GetAircraftSum(ctx context.Context) (int, error) {
 // Airplane
 
 func (r *AirlineRepository) getAirplaneData(ctx context.Context, query string,
-	args ...interface{}) ([]models.Airplane, error) {
+	args ...interface{},
+) ([]models.Airplane, error) {
 	var ap []models.Airplane
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -311,7 +310,6 @@ func (r *AirlineRepository) getAirplaneData(ctx context.Context, query string,
 			&a.EnginesType, &a.EnginesCount, &a.ConstructionNumber, &a.ProductionLine, &a.TestRegistrationNumber,
 			&a.RegistrationDate, &a.RegistrationNumber,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -326,8 +324,8 @@ func (r *AirlineRepository) getAirplaneData(ctx context.Context, query string,
 }
 
 func (r *AirlineRepository) GetAirplanes(ctx context.Context, page, pageSize int,
-	orderBy, sortBy, airlineName, modelName, productionLine, registrationNumber string) ([]models.Airplane, error) {
-
+	orderBy, sortBy, airlineName, modelName, productionLine, registrationNumber string,
+) ([]models.Airplane, error) {
 	offset := (page - 1) * pageSize
 	query := `SELECT ap.id, ap.model_name, al.airline_name, ap.plane_series, ap.plane_owner,
        												ap.plane_class,
@@ -416,7 +414,6 @@ func (r *AirlineRepository) GetAirplanes(ctx context.Context, page, pageSize int
 
 	return r.getAirplaneData(ctx, query, airlineName, orderBy, sortBy, offset, pageSize,
 		modelName, productionLine, registrationNumber)
-
 }
 
 func (r *AirlineRepository) GetAirplaneSum(ctx context.Context) (int, error) {
@@ -435,7 +432,8 @@ func (r *AirlineRepository) GetAirplaneSum(ctx context.Context) (int, error) {
 // tax
 
 func (r *AirlineRepository) getTaxData(ctx context.Context, query string,
-	args ...interface{}) ([]models.Tax, error) {
+	args ...interface{},
+) ([]models.Tax, error) {
 	var tax []models.Tax
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -450,7 +448,6 @@ func (r *AirlineRepository) getTaxData(ctx context.Context, query string,
 			&t.ID, &t.TaxName, &t.AirlineName,
 			&t.CountryName,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -465,7 +462,8 @@ func (r *AirlineRepository) getTaxData(ctx context.Context, query string,
 }
 
 func (r *AirlineRepository) GetTax(ctx context.Context, page, pageSize int,
-	orderBy, sortBy, taxName, countryName, airlineName string) ([]models.Tax, error) {
+	orderBy, sortBy, taxName, countryName, airlineName string,
+) ([]models.Tax, error) {
 	query := `SELECT
     										t.id, t.tax_name, a.airline_name, a.country_name
 											FROM tax t
