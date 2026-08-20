@@ -1,0 +1,161 @@
+package globe
+
+import (
+	"fmt"
+	"strconv"
+)
+
+// Filters is the compact control bar.
+//
+// Everything is a query parameter so the view is deep-linkable and rendered by
+// the server; htmx swaps only the panels, leaving the WebGL context alone.
+templ FilterBar(v View) {
+	<form
+		id="globe-filters"
+		class="pointer-events-auto flex flex-wrap items-center gap-2"
+		hx-get="/globe"
+		hx-target="#globe-panels"
+		hx-swap="outerHTML"
+		hx-push-url="true"
+		hx-trigger="change delay:150ms"
+	>
+		<input type="hidden" name="partial" value="globe-panels"/>
+		<label class="sr-only" for="globe-window">Window</label>
+		<select
+			id="globe-window"
+			name="window_days"
+			class="rounded-md border border-border/70 bg-card/80 px-2 py-1 text-xs backdrop-blur-md"
+		>
+			for _, option := range []int{1, 7, 30, 90} {
+				<option value={ strconv.Itoa(option) } selected?={ v.Envelope.WindowDays == option }>
+					{ windowLabel(option) }
+				</option>
+			}
+		</select>
+		<label class="sr-only" for="globe-risk">Risk</label>
+		<select
+			id="globe-risk"
+			name="risk"
+			class="rounded-md border border-border/70 bg-card/80 px-2 py-1 text-xs backdrop-blur-md"
+		>
+			<option value="" selected?={ v.Envelope.Filters.Risk == "" }>All routes</option>
+			<option value={ RiskRisk } selected?={ v.Envelope.Filters.Risk == RiskRisk }>At risk only</option>
+			<option value={ RiskWatch } selected?={ v.Envelope.Filters.Risk == RiskWatch }>Watch only</option>
+			<option value={ RiskOK } selected?={ v.Envelope.Filters.Risk == RiskOK }>On track only</option>
+		</select>
+		<label class="sr-only" for="globe-airline">Airline</label>
+		<input
+			id="globe-airline"
+			name="airline"
+			value={ v.Envelope.Filters.Airline }
+			placeholder="Airline"
+			maxlength="3"
+			class="w-20 rounded-md border border-border/70 bg-card/80 px-2 py-1 font-mono text-xs uppercase backdrop-blur-md"
+		/>
+		// Preserve the projection choice across a filter change, so switching to
+		// 2D and then filtering does not silently snap back to the globe.
+		if v.Projection == "2d" {
+			<input type="hidden" name="view" value="2d"/>
+		}
+		<noscript><button type="submit" class="rounded-md border border-border/70 px-2 py-1 text-xs">Apply</button></noscript>
+	</form>
+}
+
+func windowLabel(days int) string {
+	if days == 1 {
+		return "24 hours"
+	}
+	return fmt.Sprintf("%d days", days)
+}
+
+// ProjectionToggle switches between the globe and a flat map.
+//
+// The server renders the pressed state from ?view, so a shared link opens in the
+// projection it was shared in and there is no visible morph on load.
+templ ProjectionToggle(v View) {
+	<div
+		class="pointer-events-auto inline-flex items-center gap-0.5 rounded-full border border-border/70 bg-card/85 p-0.5 backdrop-blur-md"
+		role="group"
+		aria-label="Map projection"
+		x-data="globeProjection"
+	>
+		@projectionButton("globe", "3D", v.Projection != "2d")
+		@projectionButton("mercator", "2D", v.Projection == "2d")
+	</div>
+}
+
+templ projectionButton(value string, label string, active bool) {
+	<button
+		type="button"
+		class={
+			"rounded-full px-3 py-1 text-xs font-medium transition-colors",
+			templ.KV("bg-primary text-primary-foreground", active),
+			templ.KV("text-muted-foreground hover:text-foreground", !active),
+		}
+		data-globe-projection={ value }
+		aria-pressed={ boolAttr(active) }
+		@click={ "set('" + value + "')" }
+		:aria-pressed={ "projection === '" + value + "' ? 'true' : 'false'" }
+		:class={ "projection === '" + value + "' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" }
+	>
+		{ label }
+	</button>
+}
+
+func boolAttr(value bool) string {
+	if value {
+		return "true"
+	}
+	return "false"
+}
+
+// CoordReadout shows the position under the pointer.
+//
+// aria-live is off deliberately: a screen reader announcing coordinates on every
+// pixel of pointer movement would be hostile. The globe's own aria-label and the
+// Activities table carry the information that matters.
+templ CoordReadout(v View) {
+	<output
+		id="globe-coords"
+		class="pointer-events-none rounded-md bg-card/70 px-2 py-1 font-mono text-[10px] leading-tight text-muted-foreground backdrop-blur-md"
+		aria-live="off"
+		data-globe-coords
+	>
+		<span class="block">X: { FormatLonLat(v.Ortho.CenterLon) }</span>
+		<span class="block">Y: { FormatLonLat(v.Ortho.CenterLat) }</span>
+	</output>
+}
+
+// MiniMap is a static world inset with a marker showing where the globe points.
+templ MiniMap(v View) {
+	<div class="pointer-events-none rounded-md border border-border/60 bg-card/70 p-1 backdrop-blur-md" aria-hidden="true">
+		<svg viewBox={ MiniViewBox() } class="h-[52px] w-[104px]" data-globe-minimap>
+			<rect x="0" y="0" width={ fmt.Sprintf("%.0f", MiniWidth()) } height={ fmt.Sprintf("%.0f", MiniHeight()) } fill="var(--map-ocean)" rx="2"></rect>
+			<path d={ MiniLandPath() } fill="none" stroke="var(--map-boundary)" stroke-width="0.6" opacity="0.9"></path>
+			<circle
+				data-globe-minimap-marker
+				cx={ miniCoord(minimapX(v)) }
+				cy={ miniCoord(minimapY(v)) }
+				r="4"
+				fill="var(--map-arc-ok)"
+				fill-opacity="0.35"
+				stroke="var(--map-arc-ok)"
+				stroke-width="1"
+			></circle>
+		</svg>
+	</div>
+}
+
+func minimapX(v View) float64 {
+	x, _ := MiniProject(v.Ortho.CenterLon, v.Ortho.CenterLat)
+	return x
+}
+
+func minimapY(v View) float64 {
+	_, y := MiniProject(v.Ortho.CenterLon, v.Ortho.CenterLat)
+	return y
+}
+
+func miniCoord(value float64) string {
+	return strconv.FormatFloat(value, 'f', 1, 64)
+}
