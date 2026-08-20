@@ -21,6 +21,20 @@ Alpine.data('flightSearch', () => ({
   },
 }))
 
+const globeProjectionKey = 'skyvisor-globe-projection'
+
+Alpine.data('globeProjection', () => ({
+  // Seeded from the server-rendered pressed state so the button and the map
+  // agree before any JavaScript runs.
+  projection: document.querySelector('[data-globe-canvas]')?.dataset.globeProjection === '2d' ? 'mercator' : 'globe',
+  set(value) {
+    if (this.projection === value) return
+    this.projection = value
+    localStorage.setItem(globeProjectionKey, value === 'mercator' ? '2d' : 'globe')
+    window.dispatchEvent(new CustomEvent('sky:projection', { detail: value === 'mercator' ? '2d' : 'globe' }))
+  },
+}))
+
 const globeDrawerKey = 'skyvisor-globe-drawer'
 
 Alpine.data('globeDrawer', () => ({

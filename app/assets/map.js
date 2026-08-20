@@ -10,6 +10,7 @@ import { initFleetFilmstrip } from './map/chrome/filmstrip.js'
 import { initGlobeFocus } from './map/chrome/focus.js'
 import { initGlobeLive } from './map/chrome/live.js'
 import { initLatencyChips } from './map/chrome/latency.js'
+import { initGlobeReadout, initProjectionToggle } from './map/chrome/readout.js'
 
 let releaseLive = null
 
@@ -29,6 +30,8 @@ function startLive() {
     if (releaseLive) return
     const onEnvelope = initLatencyChips(document)
     releaseLive = initGlobeLive(canvas, { onEnvelope })
+    initGlobeReadout(document)
+    initProjectionToggle()
   }
   if (canvas._skyvisorMap) {
     canvas._skyvisorMap.once('load', attach)

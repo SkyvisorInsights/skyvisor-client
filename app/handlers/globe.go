@@ -151,6 +151,13 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 		filters.Risk = ""
 	}
 
+	// Projection is a view preference, not a data filter, so an unknown value
+	// falls back to the globe rather than rejecting the request.
+	projection := "globe"
+	if strings.EqualFold(strings.TrimSpace(query.Get("view")), "2d") {
+		projection = "2d"
+	}
+
 	ctx, cancel := context.WithTimeout(r.Context(), globeUpstreamTimeout)
 	defer cancel()
 
@@ -281,6 +288,7 @@ func (h *Handler) buildGlobeView(r *http.Request, accessToken string) (globeview
 	return globeview.View{
 		Envelope:      envelope,
 		Demo:          demo,
+		Projection:    projection,
 		Message:       message,
 		Attention:     globeview.AttentionRows(dashboard.Attention, h.service.CoordLookup()),
 		Ortho:         globeview.NewOrtho(globeCenterLon(routes), 18),

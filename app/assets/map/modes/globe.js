@@ -72,7 +72,9 @@ function riskColor(palette) {
 }
 
 export function globeLayers(map, palette, element) {
-  map.setProjection({ type: 'globe' })
+  // Respect the projection the server rendered, so a ?view=2d link does not
+  // load as a globe and then visibly flatten.
+  map.setProjection({ type: element?.dataset?.globeProjection === '2d' ? 'mercator' : 'globe' })
 
   const data = collectionsFrom(readBootstrap(element))
 

@@ -10,7 +10,10 @@ import (
 type View struct {
 	Envelope Envelope
 	// Demo marks the payload as fabricated local data. The page must say so.
-	Demo       bool
+	Demo bool
+	// Projection is "globe" or "2d", rendered server-side so a shared link opens
+	// the way it was shared and the map never visibly morphs on load.
+	Projection string
 	Message    string
 	Attention  []AttentionRow
 	Ortho      Ortho
@@ -52,6 +55,7 @@ templ Page(v View) {
 				data-globe-bootstrap="#globe-bootstrap"
 				data-map-fallback="#globe-fallback"
 				data-map-gestures="direct"
+				data-globe-projection={ v.Projection }
 				data-latitude="18"
 				data-longitude={ fmt.Sprintf("%.4f", v.Ortho.CenterLon) }
 				data-zoom="1.35"
@@ -80,8 +84,18 @@ templ Panels(v View) {
 	>
 		@bootstrap(v)
 		@header(v)
-		<div class="flex min-h-0 flex-1 items-start justify-end px-4 pb-4 sm:px-6">
-			@StatsRail(v)
+		<div class="pointer-events-none flex min-h-0 flex-1 flex-col justify-between gap-3 px-4 pb-3 sm:px-6">
+			<div class="flex items-start justify-between gap-3">
+				@FilterBar(v)
+				@StatsRail(v)
+			</div>
+			<div class="flex items-end justify-between gap-3">
+				@CoordReadout(v)
+				<div class="pointer-events-auto flex items-end gap-3">
+					@ProjectionToggle(v)
+					@MiniMap(v)
+				</div>
+			</div>
 		</div>
 		@Activities(v)
 	</div>
