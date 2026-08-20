@@ -80,6 +80,9 @@ type (
 	CreateWebhookIntegration  = domain.CreateWebhookIntegration
 	WebhookIntegrationCreated = domain.WebhookIntegrationCreated
 	WebhookDelivery           = domain.WebhookDelivery
+	CreateTrustShare          = domain.CreateTrustShare
+	TrustShareLink            = domain.TrustShareLink
+	PublicTrustReport         = domain.PublicTrustReport
 )
 
 func New(baseURL string) (*Client, error) {
