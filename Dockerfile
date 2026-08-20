@@ -7,7 +7,7 @@ RUN bun install --frozen-lockfile
 COPY app ./app
 RUN bun run build
 
-FROM golang:1.26.5-alpine AS build
+FROM golang:1.27.0-alpine AS build
 WORKDIR /src
 RUN apk add --no-cache ca-certificates git
 COPY go.mod go.sum ./
