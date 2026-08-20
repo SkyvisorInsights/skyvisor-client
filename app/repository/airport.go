@@ -21,7 +21,8 @@ func NewAirportRepository(db *pgxpool.Pool) *AirportRepository {
 }
 
 func (r *AirportRepository) getAirportData(ctx context.Context, query string,
-	args ...interface{}) ([]models.Airport, error) {
+	args ...interface{},
+) ([]models.Airport, error) {
 	var al []models.Airport
 
 	rows, err := r.pgpool.Query(ctx, query, args...)
@@ -53,7 +54,8 @@ func (r *AirportRepository) getAirportData(ctx context.Context, query string,
 }
 
 func (r *AirportRepository) GetAirports(ctx context.Context,
-	page, pageSize int, orderBy, sortBy string) ([]models.Airport, error) {
+	page, pageSize int, orderBy, sortBy string,
+) ([]models.Airport, error) {
 	query := `SELECT   id,
 			         gmt,
 			         airport_id,
@@ -230,7 +232,6 @@ func (r *AirportRepository) GetAirportsLocation(ctx context.Context) ([]models.A
 			&a.AirportName, &a.CityName, &a.CountryName, &a.PhoneNumber,
 			&a.Timezone,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -245,7 +246,8 @@ func (r *AirportRepository) GetAirportsLocation(ctx context.Context) ([]models.A
 }
 
 func (r *AirportRepository) GetAirportByName(ctx context.Context, page, pageSize int,
-	orderBy, sortBy, airportName, countryName, gmt string) ([]models.Airport, error) {
+	orderBy, sortBy, airportName, countryName, gmt string,
+) ([]models.Airport, error) {
 	query := `SELECT   id,
 				         gmt,
 				         airport_id,
@@ -369,7 +371,6 @@ func (r *AirportRepository) GetAirportByID(ctx context.Context, id int) (models.
 		&ap.CityName,
 		&ap.Timezone,
 	)
-
 	if err != nil {
 		return models.Airport{}, err
 	}

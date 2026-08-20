@@ -1,11 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
-
-	"context"
 
 	httperror "github.com/SkyvisorInsights/Aviation-tracker/app/errors"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
@@ -106,7 +105,6 @@ func (h *Handler) getFlightsResumeByStatus(w http.ResponseWriter, r *http.Reques
 	flightStatus := chi.URLParam(r, "flight_status")
 
 	lfr, err := h.service.GetFlightResumeByStatus(context.Background(), flightStatus)
-
 	if err != nil {
 		httperror.ErrNotFound.WriteError(w)
 		return models.LiveFlightsResume{}, err
@@ -117,7 +115,6 @@ func (h *Handler) getFlightsResumeByStatus(w http.ResponseWriter, r *http.Reques
 
 func (h *Handler) getFlightsResume() ([]models.LiveFlightsResume, error) {
 	lfr, err := h.service.GetFlightsResume(context.Background())
-
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +142,6 @@ func (h *Handler) getLiveFlights(w http.ResponseWriter, r *http.Request) (int, [
 	var lf []models.LiveFlights
 
 	lf, err = h.service.GetLiveFlights(context.Background(), page, pageSize, orderBy, sortBy)
-
 	if err != nil {
 		httperror.ErrNotFound.WriteError(w)
 		return 0, nil, err
@@ -155,8 +151,8 @@ func (h *Handler) getLiveFlights(w http.ResponseWriter, r *http.Request) (int, [
 }
 
 func (h *Handler) renderFlightsTable(w http.ResponseWriter,
-	r *http.Request) (templ.Component, error) {
-
+	r *http.Request,
+) (templ.Component, error) {
 	// vars := mux.Vars(r)
 	// flightStatusRoute := vars["flight_status"]
 
@@ -209,7 +205,6 @@ func (h *Handler) renderFlightsTable(w http.ResponseWriter,
 	}
 
 	lastPage, err := h.service.GetAllFlightsSum()
-
 	if err != nil {
 		httperror.ErrInternalServer.WriteError(w)
 		HandleError(err, "Error fetching total flights")
@@ -235,8 +230,8 @@ func (h *Handler) renderFlightsTable(w http.ResponseWriter,
 }
 
 func (h *Handler) renderFlightsResumeByStatus(w http.ResponseWriter,
-	r *http.Request) templ.Component {
-
+	r *http.Request,
+) templ.Component {
 	resume, err := h.getFlightsResumeByStatus(w, r)
 	if err != nil {
 		httperror.ErrNotFound.WriteError(w)
@@ -250,7 +245,6 @@ func (h *Handler) renderFlightsResumeByStatus(w http.ResponseWriter,
 }
 
 func (h *Handler) renderFlightsResume() templ.Component {
-
 	resume, err := h.getFlightsResume()
 	if err != nil {
 		HandleError(err, "Error fetching total flights")
@@ -263,8 +257,8 @@ func (h *Handler) renderFlightsResume() templ.Component {
 }
 
 func (h *Handler) renderLiveFlightsTable(w http.ResponseWriter,
-	r *http.Request) (templ.Component, error) {
-
+	r *http.Request,
+) (templ.Component, error) {
 	var sortAux string
 
 	airlineName := r.FormValue("airline_name")
@@ -355,9 +349,7 @@ func (h *Handler) getFlightsDetails(_ http.ResponseWriter, r *http.Request) (mod
 
 func (h *Handler) AllFlightsPage(w http.ResponseWriter, r *http.Request) error {
 	table, err := h.renderFlightsTable(w, r)
-
 	// create something here for banner
-
 	if err != nil {
 		HandleError(err, "Error fetching flights table")
 		return err
@@ -373,7 +365,6 @@ func (h *Handler) AllFlightsPage(w http.ResponseWriter, r *http.Request) error {
 func (h *Handler) DetailedFlightsPage(w http.ResponseWriter, r *http.Request) error {
 	s := h.renderLiveLocationsSidebar()
 	fd, err := h.getFlightsDetails(w, r)
-
 	if err != nil {
 		HandleError(err, "Error fetching flights details page")
 		return err
@@ -386,7 +377,6 @@ func (h *Handler) DetailedFlightsPage(w http.ResponseWriter, r *http.Request) er
 func (h *Handler) FlightsLocation(w http.ResponseWriter, r *http.Request) error {
 	s := h.renderLiveLocationsSidebar()
 	fd, err := h.service.GetAllFlightsLocation()
-
 	if err != nil {
 		HandleError(err, "Error fetching flights details page")
 		return err
@@ -398,7 +388,6 @@ func (h *Handler) FlightsLocation(w http.ResponseWriter, r *http.Request) error 
 
 func (h *Handler) FilteredFlightsPage(w http.ResponseWriter, r *http.Request) error {
 	table, err := h.renderFlightsTable(w, r)
-
 	if err != nil {
 		HandleError(err, "Error fetching flights table")
 		return err
@@ -415,7 +404,6 @@ func (h *Handler) FlightsLocationsByStatus(w http.ResponseWriter, r *http.Reques
 	flightStatus := chi.URLParam(r, "flight_status")
 	s := h.renderLiveLocationsSidebar()
 	fd, err := h.service.GetAllFlightsLocationsByStatus(context.Background(), flightStatus)
-
 	if err != nil {
 		HandleError(err, "Error fetching flights details page")
 		return err
@@ -440,7 +428,6 @@ func (h *Handler) LiveFlightsPage(w http.ResponseWriter, r *http.Request) error 
 func (h *Handler) LiveFlightsLocationsPage(w http.ResponseWriter, r *http.Request) error {
 	s := h.renderLiveLocationsSidebar()
 	fd, err := h.service.GetLiveFlightsLocations(context.Background())
-
 	if err != nil {
 		HandleError(err, "Error fetching flights details page")
 		return err

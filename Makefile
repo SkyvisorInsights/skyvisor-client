@@ -1,4 +1,4 @@
-.PHONY: assets basemap build dev generate api-client migrate infra-up infra-down test verify
+.PHONY: assets basemap build dev generate api-client migrate infra-up infra-down test verify hooks fmt lint-go
 
 OPENAPI_SPEC ?= ../skyvisor-api/api/openapi.yaml
 
@@ -39,3 +39,12 @@ infra-up:
 
 infra-down:
 	docker compose down
+
+hooks: ## Install versioned git hooks (.githooks → core.hooksPath)
+	bash scripts/install-hooks.sh
+
+fmt: ## Format Go sources with gofumpt
+	go tool gofumpt -w .
+
+lint-go: ## Run golangci-lint (same command the pre-commit hook and CI run)
+	golangci-lint run

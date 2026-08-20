@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
+	thinkingorbs "github.com/FACorreiaa/Thinking-orbs-go/components"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/auth"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/handlers"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/repository"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/services"
-	thinkingorbs "github.com/FACorreiaa/Thinking-orbs-go/components"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
@@ -56,7 +56,8 @@ func staticCacheHeaders(next http.Handler) http.Handler {
 
 func setupBusinessComponents(pool *pgxpool.Pool, redisClient *redis.Client, validate *validator.Validate,
 	sessionSecret []byte, cookieSecure bool, oidcClient *auth.Client,
-	apiClient *apiclient.Client) (*handlers.Handler, *repository.MiddlewareRepository) {
+	apiClient *apiclient.Client,
+) (*handlers.Handler, *repository.MiddlewareRepository) {
 	sessionStore := sessions.NewCookieStore(sessionSecret)
 	sessionStore.Options = &sessions.Options{
 		Path:     "/",
@@ -104,7 +105,8 @@ func setupBusinessComponents(pool *pgxpool.Pool, redisClient *redis.Client, vali
 }
 
 func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisClient *redis.Client,
-	oidcClient *auth.Client, apiClient *apiclient.Client) http.Handler {
+	oidcClient *auth.Client, apiClient *apiclient.Client,
+) http.Handler {
 	validate := validator.New()
 	translator, _ := ut.New(en.New(), en.New()).GetTranslator("en")
 	if err := enTranslations.RegisterDefaultTranslations(validate, translator); err != nil {

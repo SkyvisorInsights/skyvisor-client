@@ -1,0 +1,44 @@
+# golangci-lint configuration.
+# Keep this thin — prefer gofmt/go vet defaults over a large rule farm.
+
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+
+  # staticcheck and unused are disabled under Go 1.27.
+  #
+  # Both are backed by honnef.co/go/tools, which builds its own IR of every
+  # package including this module's dependencies. That IR builder does not
+  # yet understand Go 1.27 and panics rather than degrading:
+  #
+  #   v2.13.0 (honnef.co/go/tools v0.8.0-rc.1)
+  #     nilness: package "sentry": internal error: unhandled builtin recover
+  #
+  # A panic in any analyzer aborts the whole goanalysis_metalinter run, so the
+  # lint exits non-zero without reporting a single finding of ours — which
+  # would make the pre-commit hook impossible to satisfy. The same failure is
+  # documented in norviq-web's config.
+  #
+  # These two are in golangci-lint's default set, so they must be disabled
+  # explicitly; leaving them out of `enable` above does nothing. Re-enable
+  # once a staticcheck release supports Go 1.27. Every other linter still runs.
+  disable:
+    - staticcheck
+    - unused
+
+  # govet/shadow is deliberately left off here. It fires 20 times on the
+  # `if err := f(); err != nil { ... }` form, which is idiomatic Go and safe —
+  # those sites handle the error on the spot, so the shadowed outer err is
+  # never read stale. Rewriting them to satisfy the check would be churn that
+  # makes the code worse, so the check goes instead of the code.
+
+formatters:
+  enable:
+    - gofumpt

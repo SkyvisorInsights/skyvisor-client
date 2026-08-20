@@ -13,6 +13,7 @@ func connectionDot(available bool) string {
 	}
 	return "bg-amber-500"
 }
+
 func connectionLabel(available bool) string {
 	if available {
 		return "API connected"

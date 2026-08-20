@@ -1,11 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
-
-	"context"
 
 	httperror "github.com/SkyvisorInsights/Aviation-tracker/app/errors"
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"

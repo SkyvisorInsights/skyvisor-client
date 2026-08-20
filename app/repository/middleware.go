@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"net/http"
-
 	"context"
+	"net/http"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 	"github.com/go-playground/validator/v10"
