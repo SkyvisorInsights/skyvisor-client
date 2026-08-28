@@ -19,6 +19,7 @@ import (
 )
 
 const (
+	AdminTokenScopes = "adminToken.Scopes"
 	OidcBearerScopes = "oidcBearer.Scopes"
 )
 
@@ -106,9 +107,16 @@ const (
 
 // Defines values for EntitlementsPlan.
 const (
-	Business EntitlementsPlan = "business"
-	Free     EntitlementsPlan = "free"
-	Pro      EntitlementsPlan = "pro"
+	EntitlementsPlanBusiness EntitlementsPlan = "business"
+	EntitlementsPlanFree     EntitlementsPlan = "free"
+	EntitlementsPlanPro      EntitlementsPlan = "pro"
+)
+
+// Defines values for EntitlementsSituationLayerTier.
+const (
+	EntitlementsSituationLayerTierBusiness EntitlementsSituationLayerTier = "business"
+	EntitlementsSituationLayerTierCore     EntitlementsSituationLayerTier = "core"
+	EntitlementsSituationLayerTierPro      EntitlementsSituationLayerTier = "pro"
 )
 
 // Defines values for LogisticsDisruptionKind.
@@ -212,6 +220,38 @@ const (
 	RecordDecisionOutcomePredictionResultUnknown     RecordDecisionOutcomePredictionResult = "unknown"
 )
 
+// Defines values for SituationLayerCategory.
+const (
+	SituationLayerCategoryAir      SituationLayerCategory = "air"
+	SituationLayerCategoryConflict SituationLayerCategory = "conflict"
+	SituationLayerCategoryFire     SituationLayerCategory = "fire"
+	SituationLayerCategoryHazard   SituationLayerCategory = "hazard"
+	SituationLayerCategoryMarket   SituationLayerCategory = "market"
+	SituationLayerCategoryNews     SituationLayerCategory = "news"
+	SituationLayerCategorySeismic  SituationLayerCategory = "seismic"
+)
+
+// Defines values for SituationLayerGeometry.
+const (
+	None    SituationLayerGeometry = "none"
+	Point   SituationLayerGeometry = "point"
+	Polygon SituationLayerGeometry = "polygon"
+)
+
+// Defines values for SituationLayerKind.
+const (
+	SituationLayerKindIndicator SituationLayerKind = "indicator"
+	SituationLayerKindMap       SituationLayerKind = "map"
+	SituationLayerKindNews      SituationLayerKind = "news"
+)
+
+// Defines values for SituationLayerMinPlan.
+const (
+	SituationLayerMinPlanBusiness SituationLayerMinPlan = "business"
+	SituationLayerMinPlanFree     SituationLayerMinPlan = "free"
+	SituationLayerMinPlanPro      SituationLayerMinPlan = "pro"
+)
+
 // Defines values for TripSegmentConnectionRisk.
 const (
 	TripSegmentConnectionRiskMissLikely TripSegmentConnectionRisk = "miss_likely"
@@ -259,6 +299,13 @@ const (
 	DecisionExecuted  WebhookIntegrationEvents = "decision.executed"
 	DecisionProposed  WebhookIntegrationEvents = "decision.proposed"
 	DecisionRejected  WebhookIntegrationEvents = "decision.rejected"
+)
+
+// Defines values for AdminSetAccountPlanJSONBodyPlan.
+const (
+	AdminSetAccountPlanJSONBodyPlanBusiness AdminSetAccountPlanJSONBodyPlan = "business"
+	AdminSetAccountPlanJSONBodyPlanFree     AdminSetAccountPlanJSONBodyPlan = "free"
+	AdminSetAccountPlanJSONBodyPlanPro      AdminSetAccountPlanJSONBodyPlan = "pro"
 )
 
 // Defines values for GetAirportBoardParamsDirection.
@@ -476,6 +523,18 @@ type CreateTrip struct {
 	StartsAt *time.Time     `json:"starts_at,omitempty"`
 }
 
+// CreateTrustShare Request body to publish a new trust share link. All fields are optional; omitting ttl_hours defaults to 168 hours (7 days).
+type CreateTrustShare struct {
+	// IncludeFinancials Whether avoided_cost_minor and currency are included in the published report. Defaults to false (withheld).
+	IncludeFinancials *bool `json:"include_financials,omitempty"`
+
+	// Label Optional caller-supplied label shown in the trust share list.
+	Label *string `json:"label,omitempty"`
+
+	// TtlHours Hours until the share link expires. Omitted or zero defaults to 168 (7 days).
+	TtlHours *int `json:"ttl_hours,omitempty"`
+}
+
 // CreateWebhookIntegration defines model for CreateWebhookIntegration.
 type CreateWebhookIntegration struct {
 	Events []string `json:"events"`
@@ -562,19 +621,22 @@ type DecisionRecordState string
 
 // DecisionTrustMetrics defines model for DecisionTrustMetrics.
 type DecisionTrustMetrics struct {
-	ActionSuccessRate     float32          `json:"action_success_rate"`
-	AvoidedCostMinor      int64            `json:"avoided_cost_minor"`
-	Breakdowns            []TrustBreakdown `json:"breakdowns"`
-	EvaluatedPredictions  int              `json:"evaluated_predictions"`
-	ExecutedActions       int              `json:"executed_actions"`
-	FalsePositiveRate     float32          `json:"false_positive_rate"`
-	FalsePositives        int              `json:"false_positives"`
-	GeneratedAt           time.Time        `json:"generated_at"`
-	MedianLeadTimeMinutes float32          `json:"median_lead_time_minutes"`
-	Precision             float32          `json:"precision"`
-	SuccessfulActions     int              `json:"successful_actions"`
-	SuccessfulPredictions int              `json:"successful_predictions"`
-	TotalPredictions      int              `json:"total_predictions"`
+	ActionSuccessRate float32          `json:"action_success_rate"`
+	AvoidedCostMinor  int64            `json:"avoided_cost_minor"`
+	Breakdowns        []TrustBreakdown `json:"breakdowns"`
+
+	// Currency ISO 4217 currency code for avoided_cost_minor. Absent when avoided cost is not renderable (mixed or unknown currencies).
+	Currency              *string   `json:"currency,omitempty"`
+	EvaluatedPredictions  int       `json:"evaluated_predictions"`
+	ExecutedActions       int       `json:"executed_actions"`
+	FalsePositiveRate     float32   `json:"false_positive_rate"`
+	FalsePositives        int       `json:"false_positives"`
+	GeneratedAt           time.Time `json:"generated_at"`
+	MedianLeadTimeMinutes float32   `json:"median_lead_time_minutes"`
+	Precision             float32   `json:"precision"`
+	SuccessfulActions     int       `json:"successful_actions"`
+	SuccessfulPredictions int       `json:"successful_predictions"`
+	TotalPredictions      int       `json:"total_predictions"`
 }
 
 // Entitlements defines model for Entitlements.
@@ -589,8 +651,11 @@ type Entitlements struct {
 	CanAccessLogistics  bool `json:"can_access_logistics"`
 	CanCreateWatch      bool `json:"can_create_watch"`
 	CanExportAnalytics  bool `json:"can_export_analytics"`
-	CanTeamShare        bool `json:"can_team_share"`
-	EmailAlerts         bool `json:"email_alerts"`
+
+	// CanExportSituation Gates downloading a layer as a file. Narrower than reading it, because several upstreams permit display but restrict redistribution.
+	CanExportSituation *bool `json:"can_export_situation,omitempty"`
+	CanTeamShare       bool  `json:"can_team_share"`
+	EmailAlerts        bool  `json:"email_alerts"`
 
 	// McpDailyActionLimit -1 unlimited; Free 0 (read-only MCP)
 	McpDailyActionLimit int `json:"mcp_daily_action_limit"`
@@ -599,7 +664,13 @@ type Entitlements struct {
 	McpDailyReadLimit int              `json:"mcp_daily_read_limit"`
 	Plan              EntitlementsPlan `json:"plan"`
 	ProTrialEligible  bool             `json:"pro_trial_eligible"`
-	TeamSeatLimit     *int             `json:"team_seat_limit,omitempty"`
+
+	// SituationHistoryHours How far back into the observation record this plan may read.
+	SituationHistoryHours *int `json:"situation_history_hours,omitempty"`
+
+	// SituationLayerTier Which situation layers this plan unlocks. Sent so the client renders its rail from the server's mapping rather than reimplementing it.
+	SituationLayerTier *EntitlementsSituationLayerTier `json:"situation_layer_tier,omitempty"`
+	TeamSeatLimit      *int                            `json:"team_seat_limit,omitempty"`
 
 	// WatchLimit Concurrent active watches; -1 means unlimited
 	WatchLimit int `json:"watch_limit"`
@@ -607,6 +678,9 @@ type Entitlements struct {
 
 // EntitlementsPlan defines model for Entitlements.Plan.
 type EntitlementsPlan string
+
+// EntitlementsSituationLayerTier Which situation layers this plan unlocks. Sent so the client renders its rail from the server's mapping rather than reimplementing it.
+type EntitlementsSituationLayerTier string
 
 // Error defines model for Error.
 type Error struct {
@@ -870,6 +944,28 @@ type PublicShare struct {
 	Label        *string   `json:"label,omitempty"`
 }
 
+// PublicTrustReport Unauthenticated, redacted view of a trust snapshot. Financial fields are omitted entirely when the publisher withheld financials.
+type PublicTrustReport struct {
+	ActionSuccessRate float32 `json:"action_success_rate"`
+
+	// AvoidedCostMinor Absent when the publisher withheld financials (include_financials=false on the share). A present value of 0 means the account tracked activity but avoided no cost — distinct from withholding, which omits the field entirely.
+	AvoidedCostMinor *int64 `json:"avoided_cost_minor"`
+
+	// Breakdowns Per-dimension precision and false-positive-rate breakdowns. Absent when the publisher withheld financials.
+	Breakdowns *[]TrustBreakdown `json:"breakdowns,omitempty"`
+
+	// Currency ISO 4217 currency code for avoided_cost_minor. Absent whenever avoided_cost_minor is absent.
+	Currency              *string   `json:"currency,omitempty"`
+	EvaluatedPredictions  int       `json:"evaluated_predictions"`
+	ExecutedActions       int       `json:"executed_actions"`
+	ExpiresAt             time.Time `json:"expires_at"`
+	FalsePositiveRate     float32   `json:"false_positive_rate"`
+	GeneratedAt           time.Time `json:"generated_at"`
+	Label                 *string   `json:"label,omitempty"`
+	MedianLeadTimeMinutes float32   `json:"median_lead_time_minutes"`
+	Precision             float32   `json:"precision"`
+}
+
 // PushDevice defines model for PushDevice.
 type PushDevice struct {
 	CreatedAt time.Time          `json:"created_at"`
@@ -914,6 +1010,102 @@ type ShareLink struct {
 	Token     string             `json:"token"`
 	UrlPath   string             `json:"url_path"`
 	WatchId   openapi_types.UUID `json:"watch_id"`
+}
+
+// SituationEvent defines model for SituationEvent.
+type SituationEvent struct {
+	Attributes *map[string]string `json:"attributes,omitempty"`
+
+	// Attribution Required source credit, carried per item because a client may render one card alone.
+	Attribution *string `json:"attribution,omitempty"`
+	Category    string  `json:"category"`
+
+	// Country ISO 3166-1 alpha-2, on the same terms as language.
+	Country  *string `json:"country,omitempty"`
+	Headline string  `json:"headline"`
+	Id       string  `json:"id"`
+
+	// Language BCP-47. Empty when the upstream sent a name with no known mapping; the display name is kept in attributes.
+	Language   *string   `json:"language,omitempty"`
+	Layer      string    `json:"layer"`
+	Link       *string   `json:"link,omitempty"`
+	ObservedAt time.Time `json:"observed_at"`
+	Score      int       `json:"score"`
+	Severity   string    `json:"severity"`
+	Summary    *string   `json:"summary,omitempty"`
+}
+
+// SituationLayer defines model for SituationLayer.
+type SituationLayer struct {
+	// Attribution Required source credit. Several upstreams permit reuse only with credit.
+	Attribution string `json:"attribution"`
+
+	// Available Whether this deployment has a credential for the provider.
+	Available bool                   `json:"available"`
+	Category  SituationLayerCategory `json:"category"`
+	Count     *int                   `json:"count,omitempty"`
+
+	// Entitled Whether the caller's plan unlocks this layer.
+	Entitled        bool                   `json:"entitled"`
+	Freshness       *DataFreshness         `json:"freshness,omitempty"`
+	Geometry        SituationLayerGeometry `json:"geometry"`
+	Id              string                 `json:"id"`
+	IntervalSeconds *int                   `json:"interval_seconds,omitempty"`
+	Kind            SituationLayerKind     `json:"kind"`
+	Label           string                 `json:"label"`
+	Licence         string                 `json:"licence"`
+	MinPlan         SituationLayerMinPlan  `json:"min_plan"`
+	Provider        string                 `json:"provider"`
+}
+
+// SituationLayerCategory defines model for SituationLayer.Category.
+type SituationLayerCategory string
+
+// SituationLayerGeometry defines model for SituationLayer.Geometry.
+type SituationLayerGeometry string
+
+// SituationLayerKind defines model for SituationLayer.Kind.
+type SituationLayerKind string
+
+// SituationLayerMinPlan defines model for SituationLayer.MinPlan.
+type SituationLayerMinPlan string
+
+// SituationNewsPage defines model for SituationNewsPage.
+type SituationNewsPage struct {
+	Data []SituationEvent `json:"data"`
+
+	// NextCursor Empty at the end of the feed.
+	NextCursor *string `json:"next_cursor,omitempty"`
+}
+
+// SituationPoint defines model for SituationPoint.
+type SituationPoint struct {
+	AirQuality  *SituationPointBlock `json:"air_quality,omitempty"`
+	GeneratedAt time.Time            `json:"generated_at"`
+	Icao        *string              `json:"icao,omitempty"`
+	Latitude    float32              `json:"latitude"`
+	Longitude   float32              `json:"longitude"`
+	Marine      *SituationPointBlock `json:"marine,omitempty"`
+	Metar       *SituationPointBlock `json:"metar,omitempty"`
+	Station     *string              `json:"station,omitempty"`
+	Taf         *SituationPointBlock `json:"taf,omitempty"`
+	Weather     *SituationPointBlock `json:"weather,omitempty"`
+}
+
+// SituationPointBlock defines model for SituationPointBlock.
+type SituationPointBlock struct {
+	// Attributes Non-numeric readings, such as a variable wind direction reported as VRB.
+	Attributes  *map[string]string `json:"attributes,omitempty"`
+	Attribution *string            `json:"attribution,omitempty"`
+	Freshness   *DataFreshness     `json:"freshness,omitempty"`
+	ObservedAt  *time.Time         `json:"observed_at,omitempty"`
+
+	// Raw The original bulletin, for METAR and TAF. Pilots read these directly and the decoded fields lose detail.
+	Raw       *string             `json:"raw,omitempty"`
+	Units     *map[string]string  `json:"units,omitempty"`
+	ValidFrom *time.Time          `json:"valid_from,omitempty"`
+	ValidTo   *time.Time          `json:"valid_to,omitempty"`
+	Values    *map[string]float32 `json:"values,omitempty"`
 }
 
 // SourceProvenance defines model for SourceProvenance.
@@ -973,6 +1165,19 @@ type TrustBreakdown struct {
 
 // TrustBreakdownDimension defines model for TrustBreakdown.Dimension.
 type TrustBreakdownDimension string
+
+// TrustShareLink defines model for TrustShareLink.
+type TrustShareLink struct {
+	CreatedAt         time.Time `json:"created_at"`
+	ExpiresAt         time.Time `json:"expires_at"`
+	GeneratedAt       time.Time `json:"generated_at"`
+	IncludeFinancials bool      `json:"include_financials"`
+	Label             *string   `json:"label,omitempty"`
+	Token             string    `json:"token"`
+
+	// UrlPath Path (relative to the API host) serving the public report, e.g. /public/trust-shares/{token}.
+	UrlPath string `json:"url_path"`
+}
 
 // UpdateOperationalCase defines model for UpdateOperationalCase.
 type UpdateOperationalCase struct {
@@ -1085,6 +1290,14 @@ type ServiceUnavailable = Error
 // Unauthorized defines model for Unauthorized.
 type Unauthorized = Error
 
+// AdminSetAccountPlanJSONBody defines parameters for AdminSetAccountPlan.
+type AdminSetAccountPlanJSONBody struct {
+	Plan AdminSetAccountPlanJSONBodyPlan `json:"plan"`
+}
+
+// AdminSetAccountPlanJSONBodyPlan defines parameters for AdminSetAccountPlan.
+type AdminSetAccountPlanJSONBodyPlan string
+
 // GetAirportBoardParams defines parameters for GetAirportBoard.
 type GetAirportBoardParams struct {
 	Direction *GetAirportBoardParamsDirection `form:"direction,omitempty" json:"direction,omitempty"`
@@ -1173,6 +1386,42 @@ type CreatePersonalAccessTokenJSONBody struct {
 	Name      string  `json:"name"`
 }
 
+// GetSituationLayerGeoJSONParams defines parameters for GetSituationLayerGeoJSON.
+type GetSituationLayerGeoJSONParams struct {
+	// Bbox Viewport as minLon,minLat,maxLon,maxLat.
+	Bbox *string `form:"bbox,omitempty" json:"bbox,omitempty"`
+
+	// Since RFC3339. Clamped to the plan's history window.
+	Since *time.Time `form:"since,omitempty" json:"since,omitempty"`
+	Limit *int       `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// GetSituationNewsParams defines parameters for GetSituationNews.
+type GetSituationNewsParams struct {
+	// Cursor From a previous response's next_cursor. Omit for the newest page.
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Limit  *int    `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Languages Comma-separated BCP-47 codes. Omit for all languages.
+	Languages *string `form:"languages,omitempty" json:"languages,omitempty"`
+
+	// Countries Comma-separated ISO 3166-1 alpha-2 codes.
+	Countries  *string `form:"countries,omitempty" json:"countries,omitempty"`
+	Categories *string `form:"categories,omitempty" json:"categories,omitempty"`
+}
+
+// GetSituationPointParams defines parameters for GetSituationPoint.
+type GetSituationPointParams struct {
+	// Lat Latitude. Must be given together with lon.
+	Lat *float32 `form:"lat,omitempty" json:"lat,omitempty"`
+
+	// Lon Longitude. Must be given together with lat.
+	Lon *float32 `form:"lon,omitempty" json:"lon,omitempty"`
+
+	// Icao Aerodrome code. The station report supplies the position.
+	Icao *string `form:"icao,omitempty" json:"icao,omitempty"`
+}
+
 // ImportTripJSONBody defines parameters for ImportTrip.
 type ImportTripJSONBody struct {
 	Text string `json:"text"`
@@ -1196,6 +1445,9 @@ type CreateWatchJSONBody struct {
 type CreateShareJSONBody struct {
 	Label *string `json:"label,omitempty"`
 }
+
+// AdminSetAccountPlanJSONRequestBody defines body for AdminSetAccountPlan for application/json ContentType.
+type AdminSetAccountPlanJSONRequestBody AdminSetAccountPlanJSONBody
 
 // AskTravelAssistantJSONRequestBody defines body for AskTravelAssistant for application/json ContentType.
 type AskTravelAssistantJSONRequestBody AskTravelAssistantJSONBody
@@ -1226,6 +1478,9 @@ type RecordDecisionActionJSONRequestBody = RecordDecisionAction
 
 // RecordDecisionOutcomeJSONRequestBody defines body for RecordDecisionOutcome for application/json ContentType.
 type RecordDecisionOutcomeJSONRequestBody = RecordDecisionOutcome
+
+// CreateTrustShareJSONRequestBody defines body for CreateTrustShare for application/json ContentType.
+type CreateTrustShareJSONRequestBody = CreateTrustShare
 
 // CreatePersonalAccessTokenJSONRequestBody defines body for CreatePersonalAccessToken for application/json ContentType.
 type CreatePersonalAccessTokenJSONRequestBody CreatePersonalAccessTokenJSONBody
@@ -1333,8 +1588,16 @@ type ClientInterface interface {
 	// GetPublicShare request
 	GetPublicShare(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetPublicTrustReport request
+	GetPublicTrustReport(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// Readiness request
 	Readiness(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminSetAccountPlanWithBody request with any body
+	AdminSetAccountPlanWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminSetAccountPlan(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetAirportBoard request
 	GetAirportBoard(ctx context.Context, iata string, params *GetAirportBoardParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1443,6 +1706,14 @@ type ClientInterface interface {
 	// GetDecisionTrustMetrics request
 	GetDecisionTrustMetrics(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// CreateTrustShareWithBody request with any body
+	CreateTrustShareWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateTrustShare(ctx context.Context, body CreateTrustShareJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListTrustShares request
+	ListTrustShares(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListPersonalAccessTokens request
 	ListPersonalAccessTokens(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1456,6 +1727,18 @@ type ClientInterface interface {
 
 	// RevokeShare request
 	RevokeShare(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSituationLayers request
+	ListSituationLayers(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSituationLayerGeoJSON request
+	GetSituationLayerGeoJSON(ctx context.Context, layer string, params *GetSituationLayerGeoJSONParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSituationNews request
+	GetSituationNews(ctx context.Context, params *GetSituationNewsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSituationPoint request
+	GetSituationPoint(ctx context.Context, params *GetSituationPointParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetTeam request
 	GetTeam(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1496,6 +1779,9 @@ type ClientInterface interface {
 	EvaluateTripWhatIfWithBody(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	EvaluateTripWhatIf(ctx context.Context, id openapi_types.UUID, body EvaluateTripWhatIfJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RevokeTrustShare request
+	RevokeTrustShare(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUsage request
 	GetUsage(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1541,8 +1827,44 @@ func (c *Client) GetPublicShare(ctx context.Context, token string, reqEditors ..
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetPublicTrustReport(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetPublicTrustReportRequest(c.Server, token)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) Readiness(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReadinessRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminSetAccountPlanWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminSetAccountPlanRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminSetAccountPlan(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminSetAccountPlanRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2021,6 +2343,42 @@ func (c *Client) GetDecisionTrustMetrics(ctx context.Context, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
+func (c *Client) CreateTrustShareWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateTrustShareRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateTrustShare(ctx context.Context, body CreateTrustShareJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateTrustShareRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListTrustShares(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListTrustSharesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ListPersonalAccessTokens(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListPersonalAccessTokensRequest(c.Server)
 	if err != nil {
@@ -2071,6 +2429,54 @@ func (c *Client) RevokePersonalAccessToken(ctx context.Context, id openapi_types
 
 func (c *Client) RevokeShare(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRevokeShareRequest(c.Server, token)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSituationLayers(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSituationLayersRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSituationLayerGeoJSON(ctx context.Context, layer string, params *GetSituationLayerGeoJSONParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSituationLayerGeoJSONRequest(c.Server, layer, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSituationNews(ctx context.Context, params *GetSituationNewsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSituationNewsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSituationPoint(ctx context.Context, params *GetSituationPointParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSituationPointRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -2261,6 +2667,18 @@ func (c *Client) EvaluateTripWhatIf(ctx context.Context, id openapi_types.UUID, 
 	return c.Client.Do(req)
 }
 
+func (c *Client) RevokeTrustShare(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRevokeTrustShareRequest(c.Server, token)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) GetUsage(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUsageRequest(c.Server)
 	if err != nil {
@@ -2406,6 +2824,40 @@ func NewGetPublicShareRequest(server string, token string) (*http.Request, error
 	return req, nil
 }
 
+// NewGetPublicTrustReportRequest generates requests for GetPublicTrustReport
+func NewGetPublicTrustReportRequest(server string, token string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "token", runtime.ParamLocationPath, token)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/public/trust-shares/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewReadinessRequest generates requests for Readiness
 func NewReadinessRequest(server string) (*http.Request, error) {
 	var err error
@@ -2429,6 +2881,53 @@ func NewReadinessRequest(server string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewAdminSetAccountPlanRequest calls the generic AdminSetAccountPlan builder with application/json body
+func NewAdminSetAccountPlanRequest(server string, id string, body AdminSetAccountPlanJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminSetAccountPlanRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewAdminSetAccountPlanRequestWithBody generates requests for AdminSetAccountPlan with any type of body
+func NewAdminSetAccountPlanRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/admin/accounts/%s/plan", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -3792,6 +4291,73 @@ func NewGetDecisionTrustMetricsRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewCreateTrustShareRequest calls the generic CreateTrustShare builder with application/json body
+func NewCreateTrustShareRequest(server string, body CreateTrustShareJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateTrustShareRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateTrustShareRequestWithBody generates requests for CreateTrustShare with any type of body
+func NewCreateTrustShareRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/operations/trust/share")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListTrustSharesRequest generates requests for ListTrustShares
+func NewListTrustSharesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/operations/trust/shares")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewListPersonalAccessTokensRequest generates requests for ListPersonalAccessTokens
 func NewListPersonalAccessTokensRequest(server string) (*http.Request, error) {
 	var err error
@@ -3920,6 +4486,315 @@ func NewRevokeShareRequest(server string, token string) (*http.Request, error) {
 	}
 
 	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListSituationLayersRequest generates requests for ListSituationLayers
+func NewListSituationLayersRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/situation/layers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSituationLayerGeoJSONRequest generates requests for GetSituationLayerGeoJSON
+func NewGetSituationLayerGeoJSONRequest(server string, layer string, params *GetSituationLayerGeoJSONParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "layer", runtime.ParamLocationPath, layer)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/situation/layers/%s.geojson", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Bbox != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "bbox", runtime.ParamLocationQuery, *params.Bbox); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Since != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "since", runtime.ParamLocationQuery, *params.Since); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSituationNewsRequest generates requests for GetSituationNews
+func NewGetSituationNewsRequest(server string, params *GetSituationNewsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/situation/news")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cursor", runtime.ParamLocationQuery, *params.Cursor); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Languages != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "languages", runtime.ParamLocationQuery, *params.Languages); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Countries != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "countries", runtime.ParamLocationQuery, *params.Countries); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Categories != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "categories", runtime.ParamLocationQuery, *params.Categories); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSituationPointRequest generates requests for GetSituationPoint
+func NewGetSituationPointRequest(server string, params *GetSituationPointParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/situation/point")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Lat != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lat", runtime.ParamLocationQuery, *params.Lat); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Lon != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lon", runtime.ParamLocationQuery, *params.Lon); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Icao != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "icao", runtime.ParamLocationQuery, *params.Icao); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -4285,6 +5160,40 @@ func NewEvaluateTripWhatIfRequestWithBody(server string, id openapi_types.UUID, 
 	return req, nil
 }
 
+// NewRevokeTrustShareRequest generates requests for RevokeTrustShare
+func NewRevokeTrustShareRequest(server string, token string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "token", runtime.ParamLocationPath, token)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/trust-shares/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetUsageRequest generates requests for GetUsage
 func NewGetUsageRequest(server string) (*http.Request, error) {
 	var err error
@@ -4509,8 +5418,16 @@ type ClientWithResponsesInterface interface {
 	// GetPublicShareWithResponse request
 	GetPublicShareWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*GetPublicShareResp, error)
 
+	// GetPublicTrustReportWithResponse request
+	GetPublicTrustReportWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*GetPublicTrustReportResp, error)
+
 	// ReadinessWithResponse request
 	ReadinessWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadinessResp, error)
+
+	// AdminSetAccountPlanWithBodyWithResponse request with any body
+	AdminSetAccountPlanWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminSetAccountPlanResp, error)
+
+	AdminSetAccountPlanWithResponse(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminSetAccountPlanResp, error)
 
 	// GetAirportBoardWithResponse request
 	GetAirportBoardWithResponse(ctx context.Context, iata string, params *GetAirportBoardParams, reqEditors ...RequestEditorFn) (*GetAirportBoardResp, error)
@@ -4619,6 +5536,14 @@ type ClientWithResponsesInterface interface {
 	// GetDecisionTrustMetricsWithResponse request
 	GetDecisionTrustMetricsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetDecisionTrustMetricsResp, error)
 
+	// CreateTrustShareWithBodyWithResponse request with any body
+	CreateTrustShareWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTrustShareResp, error)
+
+	CreateTrustShareWithResponse(ctx context.Context, body CreateTrustShareJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTrustShareResp, error)
+
+	// ListTrustSharesWithResponse request
+	ListTrustSharesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListTrustSharesResp, error)
+
 	// ListPersonalAccessTokensWithResponse request
 	ListPersonalAccessTokensWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListPersonalAccessTokensResp, error)
 
@@ -4632,6 +5557,18 @@ type ClientWithResponsesInterface interface {
 
 	// RevokeShareWithResponse request
 	RevokeShareWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*RevokeShareResp, error)
+
+	// ListSituationLayersWithResponse request
+	ListSituationLayersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListSituationLayersResp, error)
+
+	// GetSituationLayerGeoJSONWithResponse request
+	GetSituationLayerGeoJSONWithResponse(ctx context.Context, layer string, params *GetSituationLayerGeoJSONParams, reqEditors ...RequestEditorFn) (*GetSituationLayerGeoJSONResp, error)
+
+	// GetSituationNewsWithResponse request
+	GetSituationNewsWithResponse(ctx context.Context, params *GetSituationNewsParams, reqEditors ...RequestEditorFn) (*GetSituationNewsResp, error)
+
+	// GetSituationPointWithResponse request
+	GetSituationPointWithResponse(ctx context.Context, params *GetSituationPointParams, reqEditors ...RequestEditorFn) (*GetSituationPointResp, error)
 
 	// GetTeamWithResponse request
 	GetTeamWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTeamResp, error)
@@ -4672,6 +5609,9 @@ type ClientWithResponsesInterface interface {
 	EvaluateTripWhatIfWithBodyWithResponse(ctx context.Context, id openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*EvaluateTripWhatIfResp, error)
 
 	EvaluateTripWhatIfWithResponse(ctx context.Context, id openapi_types.UUID, body EvaluateTripWhatIfJSONRequestBody, reqEditors ...RequestEditorFn) (*EvaluateTripWhatIfResp, error)
+
+	// RevokeTrustShareWithResponse request
+	RevokeTrustShareWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*RevokeTrustShareResp, error)
 
 	// GetUsageWithResponse request
 	GetUsageWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUsageResp, error)
@@ -4737,6 +5677,28 @@ func (r GetPublicShareResp) StatusCode() int {
 	return 0
 }
 
+type GetPublicTrustReportResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PublicTrustReport
+}
+
+// Status returns HTTPResponse.Status
+func (r GetPublicTrustReportResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetPublicTrustReportResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ReadinessResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -4753,6 +5715,33 @@ func (r ReadinessResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ReadinessResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminSetAccountPlanResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		// Account Internal SkyVisor account. Stable across identity providers.
+		Account      Account      `json:"account"`
+		Entitlements Entitlements `json:"entitlements"`
+	}
+	JSON401 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminSetAccountPlanResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminSetAccountPlanResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4834,7 +5823,7 @@ type AskTravelAssistantResp struct {
 	HTTPResponse *http.Response
 	JSON200      *AssistantResponse
 	JSON401      *Unauthorized
-	JSON503      *ServiceUnavailable
+	JSON503      *Error
 }
 
 // Status returns HTTPResponse.Status
@@ -5443,6 +6432,54 @@ func (r GetDecisionTrustMetricsResp) StatusCode() int {
 	return 0
 }
 
+type CreateTrustShareResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *TrustShareLink
+	JSON401      *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateTrustShareResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateTrustShareResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListTrustSharesResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Data []TrustShareLink `json:"data"`
+	}
+	JSON401 *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r ListTrustSharesResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListTrustSharesResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListPersonalAccessTokensResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5534,6 +6571,96 @@ func (r RevokeShareResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RevokeShareResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListSituationLayersResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Data *[]SituationLayer `json:"data,omitempty"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSituationLayersResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSituationLayersResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSituationLayerGeoJSONResp struct {
+	Body                  []byte
+	HTTPResponse          *http.Response
+	ApplicationgeoJSON200 *map[string]interface{}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSituationLayerGeoJSONResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSituationLayerGeoJSONResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSituationNewsResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SituationNewsPage
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSituationNewsResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSituationNewsResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSituationPointResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SituationPoint
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSituationPointResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSituationPointResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -5773,6 +6900,28 @@ func (r EvaluateTripWhatIfResp) StatusCode() int {
 	return 0
 }
 
+type RevokeTrustShareResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON401      *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r RevokeTrustShareResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RevokeTrustShareResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetUsageResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5908,6 +7057,15 @@ func (c *ClientWithResponses) GetPublicShareWithResponse(ctx context.Context, to
 	return ParseGetPublicShareResp(rsp)
 }
 
+// GetPublicTrustReportWithResponse request returning *GetPublicTrustReportResp
+func (c *ClientWithResponses) GetPublicTrustReportWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*GetPublicTrustReportResp, error) {
+	rsp, err := c.GetPublicTrustReport(ctx, token, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetPublicTrustReportResp(rsp)
+}
+
 // ReadinessWithResponse request returning *ReadinessResp
 func (c *ClientWithResponses) ReadinessWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadinessResp, error) {
 	rsp, err := c.Readiness(ctx, reqEditors...)
@@ -5915,6 +7073,23 @@ func (c *ClientWithResponses) ReadinessWithResponse(ctx context.Context, reqEdit
 		return nil, err
 	}
 	return ParseReadinessResp(rsp)
+}
+
+// AdminSetAccountPlanWithBodyWithResponse request with arbitrary body returning *AdminSetAccountPlanResp
+func (c *ClientWithResponses) AdminSetAccountPlanWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminSetAccountPlanResp, error) {
+	rsp, err := c.AdminSetAccountPlanWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminSetAccountPlanResp(rsp)
+}
+
+func (c *ClientWithResponses) AdminSetAccountPlanWithResponse(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminSetAccountPlanResp, error) {
+	rsp, err := c.AdminSetAccountPlan(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminSetAccountPlanResp(rsp)
 }
 
 // GetAirportBoardWithResponse request returning *GetAirportBoardResp
@@ -6258,6 +7433,32 @@ func (c *ClientWithResponses) GetDecisionTrustMetricsWithResponse(ctx context.Co
 	return ParseGetDecisionTrustMetricsResp(rsp)
 }
 
+// CreateTrustShareWithBodyWithResponse request with arbitrary body returning *CreateTrustShareResp
+func (c *ClientWithResponses) CreateTrustShareWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTrustShareResp, error) {
+	rsp, err := c.CreateTrustShareWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateTrustShareResp(rsp)
+}
+
+func (c *ClientWithResponses) CreateTrustShareWithResponse(ctx context.Context, body CreateTrustShareJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTrustShareResp, error) {
+	rsp, err := c.CreateTrustShare(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateTrustShareResp(rsp)
+}
+
+// ListTrustSharesWithResponse request returning *ListTrustSharesResp
+func (c *ClientWithResponses) ListTrustSharesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListTrustSharesResp, error) {
+	rsp, err := c.ListTrustShares(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListTrustSharesResp(rsp)
+}
+
 // ListPersonalAccessTokensWithResponse request returning *ListPersonalAccessTokensResp
 func (c *ClientWithResponses) ListPersonalAccessTokensWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListPersonalAccessTokensResp, error) {
 	rsp, err := c.ListPersonalAccessTokens(ctx, reqEditors...)
@@ -6300,6 +7501,42 @@ func (c *ClientWithResponses) RevokeShareWithResponse(ctx context.Context, token
 		return nil, err
 	}
 	return ParseRevokeShareResp(rsp)
+}
+
+// ListSituationLayersWithResponse request returning *ListSituationLayersResp
+func (c *ClientWithResponses) ListSituationLayersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListSituationLayersResp, error) {
+	rsp, err := c.ListSituationLayers(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSituationLayersResp(rsp)
+}
+
+// GetSituationLayerGeoJSONWithResponse request returning *GetSituationLayerGeoJSONResp
+func (c *ClientWithResponses) GetSituationLayerGeoJSONWithResponse(ctx context.Context, layer string, params *GetSituationLayerGeoJSONParams, reqEditors ...RequestEditorFn) (*GetSituationLayerGeoJSONResp, error) {
+	rsp, err := c.GetSituationLayerGeoJSON(ctx, layer, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSituationLayerGeoJSONResp(rsp)
+}
+
+// GetSituationNewsWithResponse request returning *GetSituationNewsResp
+func (c *ClientWithResponses) GetSituationNewsWithResponse(ctx context.Context, params *GetSituationNewsParams, reqEditors ...RequestEditorFn) (*GetSituationNewsResp, error) {
+	rsp, err := c.GetSituationNews(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSituationNewsResp(rsp)
+}
+
+// GetSituationPointWithResponse request returning *GetSituationPointResp
+func (c *ClientWithResponses) GetSituationPointWithResponse(ctx context.Context, params *GetSituationPointParams, reqEditors ...RequestEditorFn) (*GetSituationPointResp, error) {
+	rsp, err := c.GetSituationPoint(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSituationPointResp(rsp)
 }
 
 // GetTeamWithResponse request returning *GetTeamResp
@@ -6432,6 +7669,15 @@ func (c *ClientWithResponses) EvaluateTripWhatIfWithResponse(ctx context.Context
 	return ParseEvaluateTripWhatIfResp(rsp)
 }
 
+// RevokeTrustShareWithResponse request returning *RevokeTrustShareResp
+func (c *ClientWithResponses) RevokeTrustShareWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*RevokeTrustShareResp, error) {
+	rsp, err := c.RevokeTrustShare(ctx, token, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRevokeTrustShareResp(rsp)
+}
+
 // GetUsageWithResponse request returning *GetUsageResp
 func (c *ClientWithResponses) GetUsageWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUsageResp, error) {
 	rsp, err := c.GetUsage(ctx, reqEditors...)
@@ -6542,6 +7788,32 @@ func ParseGetPublicShareResp(rsp *http.Response) (*GetPublicShareResp, error) {
 	return response, nil
 }
 
+// ParseGetPublicTrustReportResp parses an HTTP response from a GetPublicTrustReportWithResponse call
+func ParseGetPublicTrustReportResp(rsp *http.Response) (*GetPublicTrustReportResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetPublicTrustReportResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PublicTrustReport
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseReadinessResp parses an HTTP response from a ReadinessWithResponse call
 func ParseReadinessResp(rsp *http.Response) (*ReadinessResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -6562,6 +7834,43 @@ func ParseReadinessResp(rsp *http.Response) (*ReadinessResp, error) {
 			return nil, err
 		}
 		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminSetAccountPlanResp parses an HTTP response from a AdminSetAccountPlanWithResponse call
+func ParseAdminSetAccountPlanResp(rsp *http.Response) (*AdminSetAccountPlanResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminSetAccountPlanResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// Account Internal SkyVisor account. Stable across identity providers.
+			Account      Account      `json:"account"`
+			Entitlements Entitlements `json:"entitlements"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	}
 
@@ -6703,7 +8012,7 @@ func ParseAskTravelAssistantResp(rsp *http.Response) (*AskTravelAssistantResp, e
 		response.JSON401 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
-		var dest ServiceUnavailable
+		var dest Error
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -7514,6 +8823,74 @@ func ParseGetDecisionTrustMetricsResp(rsp *http.Response) (*GetDecisionTrustMetr
 	return response, nil
 }
 
+// ParseCreateTrustShareResp parses an HTTP response from a CreateTrustShareWithResponse call
+func ParseCreateTrustShareResp(rsp *http.Response) (*CreateTrustShareResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateTrustShareResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest TrustShareLink
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListTrustSharesResp parses an HTTP response from a ListTrustSharesWithResponse call
+func ParseListTrustSharesResp(rsp *http.Response) (*ListTrustSharesResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListTrustSharesResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Data []TrustShareLink `json:"data"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListPersonalAccessTokensResp parses an HTTP response from a ListPersonalAccessTokensWithResponse call
 func ParseListPersonalAccessTokensResp(rsp *http.Response) (*ListPersonalAccessTokensResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -7633,6 +9010,112 @@ func ParseRevokeShareResp(rsp *http.Response) (*RevokeShareResp, error) {
 			return nil, err
 		}
 		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSituationLayersResp parses an HTTP response from a ListSituationLayersWithResponse call
+func ParseListSituationLayersResp(rsp *http.Response) (*ListSituationLayersResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSituationLayersResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Data *[]SituationLayer `json:"data,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSituationLayerGeoJSONResp parses an HTTP response from a GetSituationLayerGeoJSONWithResponse call
+func ParseGetSituationLayerGeoJSONResp(rsp *http.Response) (*GetSituationLayerGeoJSONResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSituationLayerGeoJSONResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationgeoJSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSituationNewsResp parses an HTTP response from a GetSituationNewsWithResponse call
+func ParseGetSituationNewsResp(rsp *http.Response) (*GetSituationNewsResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSituationNewsResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SituationNewsPage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSituationPointResp parses an HTTP response from a GetSituationPointWithResponse call
+func ParseGetSituationPointResp(rsp *http.Response) (*GetSituationPointResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSituationPointResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SituationPoint
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 
@@ -7966,6 +9449,32 @@ func ParseEvaluateTripWhatIfResp(rsp *http.Response) (*EvaluateTripWhatIfResp, e
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRevokeTrustShareResp parses an HTTP response from a RevokeTrustShareWithResponse call
+func ParseRevokeTrustShareResp(rsp *http.Response) (*RevokeTrustShareResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RevokeTrustShareResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest Unauthorized
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
