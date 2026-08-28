@@ -117,6 +117,26 @@ export function liveStatus() {
 }
 
 const REFRESH_EVENTS = ['flight.updated', 'flight.delayed', 'flight.cancelled', 'gate.changed']
+
+// Which live events should make one element re-fetch itself.
+//
+// Defaults to the flight events, which is what every consumer wanted when this
+// was the only kind of live data. An element may name its own instead: the
+// situation news rail listens for situation events, and subscribing it to the
+// flight events would refetch sixty stories every time an unrelated aircraft
+// changed gate. A blank declaration is a template mistake rather than a request
+// to subscribe to nothing, so it falls back to the default.
+export function refreshEventsFor(element) {
+  const declared = element?.dataset?.liveRefreshEvents
+  if (typeof declared !== 'string') return REFRESH_EVENTS
+
+  const events = declared
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean)
+
+  return events.length > 0 ? events : REFRESH_EVENTS
+}
 const REFRESH_DEBOUNCE_MS = 450
 
 // Wires elements that want to re-fetch themselves over htmx when live data moves.
@@ -139,7 +159,7 @@ export function initLiveRefresh(root = document) {
       }, REFRESH_DEBOUNCE_MS)
     }
 
-    const release = subscribe(REFRESH_EVENTS, refresh)
+    const release = subscribe(refreshEventsFor(element), refresh)
     element._skyvisorLiveRelease = () => {
       window.clearTimeout(timer)
       release()

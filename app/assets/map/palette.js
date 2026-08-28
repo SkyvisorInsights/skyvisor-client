@@ -20,6 +20,20 @@ export const PALETTE_KEYS = [
   'label',
   'label-halo',
   'atmosphere',
+  // Situation layers. One token per category, plus the severity ramp shared by
+  // every graded layer, so adding a layer needs no new colour decision.
+  'situation-hazard',
+  'situation-seismic',
+  'situation-fire',
+  'situation-conflict',
+  'situation-news',
+  'situation-market',
+  'situation-air',
+  'situation-info',
+  'situation-advisory',
+  'situation-watch',
+  'situation-warning',
+  'situation-severe',
 ]
 
 // Last-resort colours. If a token is renamed or the canvas trick is unavailable
@@ -37,6 +51,18 @@ export const PALETTE_FALLBACK = {
   label: '#e8ecf6',
   'label-halo': '#0b1220',
   atmosphere: '#4f7fe0',
+  'situation-hazard': '#f0a63a',
+  'situation-seismic': '#c084fc',
+  'situation-fire': '#fb7185',
+  'situation-conflict': '#f2555a',
+  'situation-news': '#60a5fa',
+  'situation-market': '#34d399',
+  'situation-air': '#22d3ee',
+  'situation-info': '#7f96c4',
+  'situation-advisory': '#60a5fa',
+  'situation-watch': '#f0a63a',
+  'situation-warning': '#fb923c',
+  'situation-severe': '#f2555a',
 }
 
 let probe = null

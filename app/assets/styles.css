@@ -74,6 +74,19 @@
   --map-label: var(--foreground);
   --map-label-halo: oklch(1 0 0);
   --map-atmosphere: oklch(0.72 0.11 250);
+  /* Situation layers: one token per category plus the shared severity ramp. */
+  --map-situation-hazard: oklch(0.78 0.14 70);
+  --map-situation-seismic: oklch(0.72 0.17 305);
+  --map-situation-fire: oklch(0.70 0.18 20);
+  --map-situation-conflict: oklch(0.65 0.20 25);
+  --map-situation-news: oklch(0.72 0.13 250);
+  --map-situation-market: oklch(0.76 0.13 160);
+  --map-situation-air: oklch(0.78 0.12 200);
+  --map-situation-info: oklch(0.65 0.05 260);
+  --map-situation-advisory: oklch(0.72 0.13 250);
+  --map-situation-watch: oklch(0.78 0.14 70);
+  --map-situation-warning: oklch(0.72 0.17 45);
+  --map-situation-severe: oklch(0.65 0.20 25);
 }
 
 .dark {
@@ -111,6 +124,19 @@
   --map-label: var(--foreground);
   --map-label-halo: oklch(0.14 0.026 255);
   --map-atmosphere: oklch(0.55 0.16 250);
+  /* Situation layers, lifted for contrast against the dark ocean. */
+  --map-situation-hazard: oklch(0.82 0.15 70);
+  --map-situation-seismic: oklch(0.78 0.18 305);
+  --map-situation-fire: oklch(0.76 0.19 20);
+  --map-situation-conflict: oklch(0.72 0.21 25);
+  --map-situation-news: oklch(0.78 0.14 250);
+  --map-situation-market: oklch(0.82 0.14 160);
+  --map-situation-air: oklch(0.84 0.13 200);
+  --map-situation-info: oklch(0.72 0.05 260);
+  --map-situation-advisory: oklch(0.78 0.14 250);
+  --map-situation-watch: oklch(0.82 0.15 70);
+  --map-situation-warning: oklch(0.78 0.18 45);
+  --map-situation-severe: oklch(0.72 0.21 25);
 }
 
 html { overflow-x: clip; scroll-behavior: smooth; }

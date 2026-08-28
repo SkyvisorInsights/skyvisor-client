@@ -1,0 +1,63 @@
+package legal
+
+import "github.com/SkyvisorInsights/skyvisor-go-shared/domain"
+
+// DataSourcesPage credits every upstream the situation monitor draws on.
+//
+// Rendered from the live layer catalogue rather than a hand-written list, so a
+// layer cannot ship without its credit appearing here. Several of these sources
+// permit reuse only with attribution and two forbid commercial use outright, so
+// this page is a licence obligation rather than a courtesy.
+templ DataSourcesPage(layers []domain.SituationLayer) {
+	<div class="prose prose-sm mx-auto max-w-3xl py-10 dark:prose-invert">
+		<h1>Data sources</h1>
+		<p>
+			The global situation monitor combines public feeds from meteorological
+			agencies, geological surveys, humanitarian bodies and news aggregators.
+			Each is credited below on the terms its licence requires.
+		</p>
+		if len(layers) == 0 {
+			<p>Situation monitoring is not enabled in this environment.</p>
+		} else {
+			<table>
+				<thead>
+					<tr>
+						<th>Layer</th>
+						<th>Source</th>
+						<th>Licence</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, layer := range layers {
+						<tr>
+							<td>{ layer.Label }</td>
+							<td>{ layer.Attribution }</td>
+							<td><code>{ layer.Licence }</code></td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		<h2>Non-commercial sources</h2>
+		<p>
+			Two of these licences forbid commercial use. Layers built on them are
+			available identically on every plan and are never sold as part of a
+			paid tier:
+		</p>
+		<ul>
+			<li>
+				<strong>GDELT</strong> — CC&nbsp;BY-NC-SA&nbsp;4.0. The world news rail.
+			</li>
+			<li>
+				<strong>Open-Meteo</strong> — the free tier is non-commercial. Surface
+				weather, sea state and air quality on point lookups.
+			</li>
+		</ul>
+		<h2>Accuracy</h2>
+		<p>
+			None of this is a substitute for an official briefing. Aeronautical
+			decisions must be made against the originating authority's own
+			publication, not against this page or the map it describes.
+		</p>
+	</div>
+}
