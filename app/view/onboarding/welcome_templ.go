@@ -70,7 +70,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if plan == "pro" || plan == "business" {
+		if plan == "pro" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div x-bind:class=\"shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'\" class=\"mt-8 transition-all delay-100 duration-500 ease-out motion-reduce:transition-none\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -107,22 +107,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"text-sm\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					if plan == "pro" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"font-medium text-foreground\">You picked Pro.</span> <span class=\"text-muted-foreground\">Finish checkout whenever you are ready; the free plan is active until then.</span>")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-					} else {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"font-medium text-foreground\">You picked Business.</span> <span class=\"text-muted-foreground\">Finish checkout whenever you are ready; the free plan is active until then.</span>")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p></div><form method=\"post\" action=\"/billing/checkout\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"text-sm\"><span class=\"font-medium text-foreground\">You picked Pro.</span> <span class=\"text-muted-foreground\">Finish checkout whenever you are ready; the free plan is active until then.</span></p></div><form method=\"post\" action=\"/billing/checkout\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -142,7 +127,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 							}()
 						}
 						ctx = templ.InitializeContext(ctx)
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "Continue to checkout ")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "Continue to checkout ")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -152,7 +137,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</form>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</form>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -168,12 +153,12 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div x-bind:class=\"shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'\" class=\"mt-8 transition-all delay-150 duration-500 ease-out motion-reduce:transition-none\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div x-bind:class=\"shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'\" class=\"mt-8 transition-all delay-150 duration-500 ease-out motion-reduce:transition-none\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -213,7 +198,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "Watch your first flight ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "Watch your first flight ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -223,7 +208,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, " ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -239,7 +224,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "Enter a flight number for today or the days ahead. You can add it to a trip later. ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "Enter a flight number for today or the days ahead. You can add it to a trip later. ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -255,7 +240,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -271,7 +256,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<form method=\"post\" action=\"/watches\" class=\"flex flex-col gap-2 sm:flex-row\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<form method=\"post\" action=\"/watches\" class=\"flex flex-col gap-2 sm:flex-row\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -279,7 +264,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<input type=\"hidden\" name=\"return_to\" value=\"/watches?welcome=1\"> <label for=\"welcome-flight-number\" class=\"sr-only\">Flight number</label> <input id=\"welcome-flight-number\" name=\"flight_number\" required autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Flight number, for example TP1363\" class=\"h-11 min-w-0 flex-1 rounded-md border border-input bg-background px-3 font-mono text-sm uppercase placeholder:normal-case\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<input type=\"hidden\" name=\"return_to\" value=\"/watches?welcome=1\"> <label for=\"welcome-flight-number\" class=\"sr-only\">Flight number</label> <input id=\"welcome-flight-number\" name=\"flight_number\" required autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Flight number, for example TP1363\" class=\"h-11 min-w-0 flex-1 rounded-md border border-input bg-background px-3 font-mono text-sm uppercase placeholder:normal-case\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -295,7 +280,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 						}()
 					}
 					ctx = templ.InitializeContext(ctx)
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "Start watching")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "Start watching")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -309,7 +294,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -325,7 +310,7 @@ func WelcomePage(name, plan, csrfToken string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div><div x-bind:class=\"shown ? 'opacity-100' : 'opacity-0'\" class=\"mt-6 transition-opacity delay-300 duration-500 ease-out motion-reduce:transition-none\"><p class=\"text-sm text-muted-foreground\">No flight yet? <a href=\"/dashboard\" class=\"font-medium text-primary underline-offset-4 hover:underline\">Skip to your dashboard</a> or <a href=\"/trips\" class=\"font-medium text-primary underline-offset-4 hover:underline\">import a booking PDF</a>.</p></div></div></section></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div><div x-bind:class=\"shown ? 'opacity-100' : 'opacity-0'\" class=\"mt-6 transition-opacity delay-300 duration-500 ease-out motion-reduce:transition-none\"><p class=\"text-sm text-muted-foreground\">No flight yet? <a href=\"/dashboard\" class=\"font-medium text-primary underline-offset-4 hover:underline\">Skip to your dashboard</a> or <a href=\"/trips\" class=\"font-medium text-primary underline-offset-4 hover:underline\">import a booking PDF</a>.</p></div></div></section></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

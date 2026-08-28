@@ -47,8 +47,12 @@ var tiers = []tier{
 		YearlyNote: "$41/mo billed yearly",
 		Tagline:    "For small ops and logistics teams working the same flights.",
 		Features:   []string{"Everything in Pro", "Team workspace for up to 5 people", "Shared watches and team alerts", "Operational cases and decision records", "Workflow webhooks", "Priority support"},
-		CTALabel:   "Start Business",
-		CTAHref:    "/register?plan=business",
+		// Sales-led, like Enterprise. Checkout carries a single Stripe price and
+		// it is Pro's, so a self-serve Business path charges the wrong amount
+		// and grants the wrong plan. Restore this to a checkout link only
+		// alongside a Business price ID.
+		CTALabel:   "Talk to us",
+		CTAHref:    "mailto:fernandocorreia316@gmail.com?subject=SkyVisor%20Business",
 	},
 	{
 		Name:     "Enterprise",
