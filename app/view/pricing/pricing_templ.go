@@ -55,8 +55,12 @@ var tiers = []tier{
 		YearlyNote: "$41/mo billed yearly",
 		Tagline:    "For small ops and logistics teams working the same flights.",
 		Features:   []string{"Everything in Pro", "Team workspace for up to 5 people", "Shared watches and team alerts", "Operational cases and decision records", "Workflow webhooks", "Priority support"},
-		CTALabel:   "Start Business",
-		CTAHref:    "/register?plan=business",
+		// Sales-led, like Enterprise. Checkout carries a single Stripe price and
+		// it is Pro's, so a self-serve Business path charges the wrong amount
+		// and grants the wrong plan. Restore this to a checkout link only
+		// alongside a Business price ID.
+		CTALabel: "Talk to us",
+		CTAHref:  "mailto:fernandocorreia316@gmail.com?subject=SkyVisor%20Business",
 	},
 	{
 		Name:     "Enterprise",
@@ -232,7 +236,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(t.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 114, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 118, Col: 60}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -285,7 +289,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue("yearly ? '" + t.Yearly + "' : '" + t.Monthly + "'")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 123, Col: 116}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 127, Col: 116}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 				if templ_7745c5c3_Err != nil {
@@ -298,7 +302,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(t.Monthly)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 123, Col: 130}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 127, Col: 130}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -311,7 +315,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue("yearly ? '/year' : '/month'")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 124, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 128, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 				if templ_7745c5c3_Err != nil {
@@ -334,7 +338,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(t.YearlyNote)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 128, Col: 119}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 132, Col: 119}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -369,7 +373,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(t.Tagline)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 132, Col: 80}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 136, Col: 80}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
@@ -419,7 +423,7 @@ func tierCardBody(t tier) templ.Component {
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(feature)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 139, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 143, Col: 50}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -450,7 +454,7 @@ func tierCardBody(t tier) templ.Component {
 					var templ_7745c5c3_Var19 string
 					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(t.CTALabel)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 144, Col: 131}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 148, Col: 131}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 					if templ_7745c5c3_Err != nil {
@@ -478,7 +482,7 @@ func tierCardBody(t tier) templ.Component {
 					var templ_7745c5c3_Var21 string
 					templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(t.CTALabel)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 146, Col: 163}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/view/pricing/pricing.templ`, Line: 150, Col: 163}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 					if templ_7745c5c3_Err != nil {

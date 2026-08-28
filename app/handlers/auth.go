@@ -53,7 +53,8 @@ func (h *Handler) startAuthFlow(w http.ResponseWriter, r *http.Request, extra ..
 	s.Values[sessionKeyOIDCVerifier] = verifier
 	s.Values[sessionKeyOIDCReturnTo] = safeReturnPath(r.URL.Query().Get("return_to"))
 	// Carry the pricing intent (/register?plan=pro) through the IdP round-trip.
-	if plan := r.URL.Query().Get("plan"); plan == "pro" || plan == "business" {
+	// Pro only: Business is sales-led and has no checkout to be carried to.
+	if plan := r.URL.Query().Get("plan"); plan == "pro" {
 		s.Values[sessionKeyOIDCPlan] = plan
 	}
 	if err := s.Save(r, w); err != nil {
