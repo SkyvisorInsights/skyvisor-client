@@ -23,7 +23,56 @@ Alpine.data('flightSearch', () => ({
 
 const globeProjectionKey = 'skyvisor-globe-projection'
 
-Alpine.data('globeProjection', () => ({
+  // The situation layer rail. Toggling drives MapLibre visibility directly
+  // rather than re-rendering, and the chosen set is remembered per viewer so a
+  // reload does not reset the map to blank.
+  Alpine.data('situationPage', () => ({
+    enabled: [],
+    alerts: [],
+
+    init() {
+      try {
+        this.enabled = JSON.parse(localStorage.getItem('skyvisor:situation:layers') || '[]')
+      } catch {
+        this.enabled = []
+      }
+      this.$nextTick(() => this.enabled.forEach((id) => this.apply(id, true)))
+
+      // Alerts are raised by the map module and rendered here. Capped and
+      // newest-first: an unbounded list turns a busy hour into a wall that
+      // hides the map it is describing.
+      window.addEventListener('skyvisor:situation-alert', (event) => {
+        const message = event.detail?.message
+        if (!message) return
+        this.alerts = [{ id: `${Date.now()}-${this.alerts.length}`, message }, ...this.alerts].slice(0, 4)
+      })
+    },
+
+    dismiss(id) {
+      this.alerts = this.alerts.filter((alert) => alert.id !== id)
+    },
+
+    toggle(layerId, on) {
+      this.enabled = on
+        ? [...new Set([...this.enabled, layerId])]
+        : this.enabled.filter((id) => id !== layerId)
+      try {
+        localStorage.setItem('skyvisor:situation:layers', JSON.stringify(this.enabled))
+      } catch {
+        // A viewer with storage disabled still gets a working map; only the
+        // remembered selection is lost.
+      }
+      this.apply(layerId, on)
+    },
+
+    apply(layerId, on) {
+      window.dispatchEvent(new CustomEvent('skyvisor:situation-layer', {
+        detail: { layerId, visible: on },
+      }))
+    },
+  }))
+
+  Alpine.data('globeProjection', () => ({
   // Seeded from the server-rendered pressed state so the button and the map
   // agree before any JavaScript runs.
   projection: document.querySelector('[data-globe-canvas]')?.dataset.globeProjection === '2d' ? 'mercator' : 'globe',

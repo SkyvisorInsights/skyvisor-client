@@ -136,6 +136,7 @@ func (h *Handler) createLayoutVariant(_ http.ResponseWriter, r *http.Request, ti
 		nav = []models.NavItem{
 			{Path: "/dashboard", Label: "Dashboard", Icon: svg2.HomeIcon()},
 			{Path: "/globe", Label: "Global view", Icon: svg2.GlobeIcon()},
+			{Path: "/situation", Label: "Global situation", Icon: svg2.GlobeIcon()},
 			{Path: "/trips", Label: "Trips", Icon: svg2.PaperAirplaneIcon()},
 			{Label: "Monitor", Icon: svg2.PaperAirplaneIcon(), SubItems: []models.NavItem{
 				{Path: "/track", Label: "Flight lookup"},

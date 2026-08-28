@@ -185,6 +185,9 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 	r.With(authMiddleware.AuthMiddleware).Get("/track", handler(h.TrackFlight))
 	r.With(authMiddleware.AuthMiddleware).Get("/terms", handler(h.TermsPage))
 	r.With(authMiddleware.AuthMiddleware).Get("/privacy", handler(h.PrivacyPage))
+	// Public, like the other legal pages: whoever must be credited does not
+	// depend on who is reading.
+	r.With(authMiddleware.AuthMiddleware).Get("/legal/data-sources", handler(h.DataSourcesPage))
 	r.With(authMiddleware.AuthMiddleware).Get("/pricing", handler(h.PricingPage))
 	// Public pickup share pages do not require a session.
 	r.With(authMiddleware.AuthMiddleware).Get("/share/{token}", handler(h.SharePage))
@@ -210,6 +213,9 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		auth.Get("/dashboard", handler(h.DashboardPage))
 		auth.Get("/globe", handler(h.GlobePage))
 		auth.Get("/globe/data", handler(h.GlobeData))
+		auth.Get("/situation", handler(h.SituationPage))
+		auth.Get("/situation/layers/{layer}", handler(h.SituationLayerData))
+		auth.Get("/situation/news", handler(h.SituationNews))
 		auth.Get("/settings", handler(h.SettingsPage))
 		auth.Post("/settings/alerts", handler(h.SettingsAlerts))
 		auth.Post("/settings/tokens", handler(h.SettingsTokensCreate))

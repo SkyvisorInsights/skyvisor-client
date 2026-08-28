@@ -2,6 +2,8 @@ import maplibregl from 'maplibre-gl'
 import { flightLayers } from './modes/flight.js'
 import { fleetLayers } from './modes/fleet.js'
 import { globeLayers, readBootstrap, renderLabels, setGlobeData, spinGlobe } from './modes/globe.js'
+import { refreshSituationLayer, repaintSituation, setLayerVisibility, situationLayers, watchSituationEvents } from './modes/situation.js'
+import { subscribe } from '../core/live.js'
 import { resolveMapPalette } from './palette.js'
 import { buildStyle, repaint, skySpec } from './style.js'
 import { hasWebGL, isLowPowerDevice } from './webgl.js'
@@ -12,7 +14,14 @@ const active = new Set()
 // Each map remembers the scheme it was created with, so a theme toggle does not
 // repaint a deliberately-dark container with light colours.
 function applyPalette() {
-  active.forEach((map) => repaint(map, resolveMapPalette(map._skyvisorScheme)))
+  active.forEach((map) => {
+    const palette = resolveMapPalette(map._skyvisorScheme)
+    repaint(map, palette)
+    // Situation layers are server-driven, so they cannot appear in the static
+    // PAINT_BINDINGS list repaint() walks. They repaint themselves, and must do
+    // so after it: repaint() would otherwise flatten their severity grading.
+    repaintSituation(map, palette)
+  })
 }
 
 // Themes are announced by core/theme.js. Registered once at module load.
@@ -119,6 +128,46 @@ export function initMaps(root = document) {
         }
       }
 
+      if (mode === 'situation') {
+        const catalogue = readBootstrap(element)
+        situationLayers(map, palette, (catalogue && catalogue.layers) || [])
+
+        // Which layers are actually switched on. A live update for anything
+        // else is ignored: refetching a layer nobody is looking at spends the
+        // request for a picture that is never drawn.
+        const visibleLayers = new Set()
+
+        // The rail lives outside this element, so the two talk over an event
+        // rather than the rail reaching into the map instance.
+        const onToggle = (event) => {
+          const { layerId, visible } = event.detail || {}
+          if (!layerId) return
+          setLayerVisibility(map, layerId, visible)
+          if (visible) {
+            visibleLayers.add(layerId)
+            refreshSituationLayer(map, layerId)
+          } else {
+            visibleLayers.delete(layerId)
+          }
+        }
+        window.addEventListener('skyvisor:situation-layer', onToggle)
+
+        // Alerts are raised for the page to render rather than drawn here: a
+        // map module has no business owning a toast.
+        const releaseLive = watchSituationEvents(map, visibleLayers, {
+          subscribe,
+          onAlert: (message, payload) => {
+            window.dispatchEvent(new CustomEvent('skyvisor:situation-alert', {
+              detail: { message, payload },
+            }))
+          },
+        })
+
+        element._skyvisorSituationRelease = () => {
+          window.removeEventListener('skyvisor:situation-layer', onToggle)
+          releaseLive()
+        }
+      }
       if (mode === 'flight') flightLayers(map, element)
       if (mode === 'fleet') fleetLayers(map, element)
       if (mode === 'globe') {

@@ -313,5 +313,10 @@ func friendlyAPIError(err error, fallback string) string {
 			return strings.ToUpper(detail[:1]) + detail[1:] + "."
 		}
 	}
+	// 503 means every AI provider is out of credit or rate limited. That is
+	// worth retrying shortly, unlike the generic failure below.
+	if strings.Contains(message, "skyvisor-api 503") && strings.Contains(message, "assistant_exhausted") {
+		return "The AI is busy right now. Please try again in a few minutes."
+	}
 	return fallback
 }

@@ -1,0 +1,87 @@
+package situation
+
+import (
+	"fmt"
+
+	"github.com/SkyvisorInsights/skyvisor-go-shared/domain"
+)
+
+// NewsRail is the story column beside the globe.
+//
+// Swapped in on its own by htmx, so it carries its own attribution rather than
+// relying on the page footer being present in the DOM.
+templ NewsRail(v NewsView) {
+	<section
+		id="situation-news"
+		class="m-3 flex w-80 flex-col gap-2 overflow-y-auto rounded-lg border border-border bg-background/85 p-3 backdrop-blur"
+		data-live-refresh-url="/situation/news"
+		data-live-refresh-target="#situation-news"
+		data-live-refresh-events="situation.news"
+		hx-get="/situation/news"
+		hx-trigger="every 60s"
+		hx-target="#situation-news"
+		hx-swap="outerHTML"
+	>
+		<div class="flex items-baseline justify-between">
+			<h2 class="text-sm font-semibold">World news</h2>
+			<span class="text-xs text-muted-foreground">{ fmt.Sprintf("%d", len(v.Items)) }</span>
+		</div>
+		if v.Unavailable != "" {
+			<p class="rounded-md border border-border bg-muted/40 p-2 text-xs text-muted-foreground">
+				{ v.Unavailable }
+			</p>
+		} else if len(v.Items) == 0 {
+			<p class="p-2 text-xs text-muted-foreground">Nothing has come through yet.</p>
+		}
+		for _, item := range v.Items {
+			@NewsCard(item)
+		}
+		if v.HasMore() {
+			<button
+				type="button"
+				class="rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted/60"
+				hx-get={ "/situation/news?cursor=" + v.NextCursor }
+				hx-target="#situation-news"
+				hx-swap="outerHTML"
+			>
+				Load older stories
+			</button>
+		}
+		if len(v.Attributions()) > 0 {
+			<p class="pt-1 text-[11px] text-muted-foreground">
+				for index, credit := range v.Attributions() {
+					if index > 0 {
+						<span> · </span>
+					}
+					<span>{ credit }</span>
+				}
+			</p>
+		}
+	</section>
+}
+
+// NewsCard is one story. The link opens the publisher, which is the only thing
+// a reader can actually act on.
+templ NewsCard(item domain.SituationEvent) {
+	<a
+		href={ templ.SafeURL(item.Link) }
+		target="_blank"
+		rel="noopener noreferrer"
+		class="flex flex-col gap-1 rounded-md border border-border/60 p-2 hover:bg-muted/60"
+	>
+		<span class="text-sm leading-snug">{ item.Headline }</span>
+		<span class="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+			if domain := item.Attributes["domain"]; domain != "" {
+				<span class="truncate">{ domain }</span>
+				<span>·</span>
+			}
+			<time datetime={ item.ObservedAt.Format("2006-01-02T15:04:05Z07:00") }>
+				{ item.ObservedAt.Format("15:04") }
+			</time>
+			if name := item.Attributes["language_name"]; name != "" {
+				<span>·</span>
+				<span>{ name }</span>
+			}
+		</span>
+	</a>
+}
