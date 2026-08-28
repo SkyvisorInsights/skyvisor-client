@@ -13,8 +13,11 @@ func (h *Handler) WelcomePage(w http.ResponseWriter, r *http.Request) error {
 	if currentUser, ok := r.Context().Value(models.CtxKeyAuthUser).(*models.UserSession); ok && currentUser != nil {
 		name = currentUser.Username
 	}
+	// Pro only. A business intent reaching the welcome page rendered a checkout
+	// form posting to the single Pro price, so a bookmarked or stale
+	// ?plan=business link is dropped rather than honoured.
 	plan := r.URL.Query().Get("plan")
-	if plan != "pro" && plan != "business" {
+	if plan != "pro" {
 		plan = ""
 	}
 	page := onboarding.WelcomePage(name, plan, csrf.Token(r))
