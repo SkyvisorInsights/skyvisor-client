@@ -102,6 +102,9 @@ type LayoutTempl struct {
 	Content   templ.Component
 	CSRFToken string
 	Variant   LayoutVariant
+	// LegacyMap loads the OpenLayers bundle. It is render-blocking and large,
+	// so only the Reference and Explorer pages that draw an ol.Map set it.
+	LegacyMap bool
 }
 
 type SettingsPage struct {

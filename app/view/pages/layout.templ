@@ -18,7 +18,12 @@ templ LayoutPage(l models.LayoutTempl) {
 			<link rel="stylesheet" href="/static/css/maplibre-gl.css"/>
 			<link rel="stylesheet" href="/static/css/app.css"/>
 			<script src="/static/js/theme.js"></script>
-			<script src="/static/js/ol.js"></script>
+			if l.LegacyMap {
+				// Reference and Explorer pages draw their maps from an inline
+				// script against the global `ol`, so this must load before the
+				// body parses and cannot be deferred.
+				<script src="/static/js/ol.js"></script>
+			}
 			<script src="/static/js/arc.js"></script>
 			<script defer src="/static/js/app.js"></script>
 			@orb.Script()
