@@ -171,6 +171,7 @@ func (h *Handler) createLayoutVariant(_ http.ResponseWriter, r *http.Request, ti
 		Content:   data,
 		CSRFToken: csrf.Token(r),
 		Variant:   variant,
+		LegacyMap: needsLegacyMap(r.URL.Path),
 	}
 
 	return pages.LayoutPage(l)
