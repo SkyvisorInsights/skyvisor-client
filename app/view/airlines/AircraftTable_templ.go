@@ -99,7 +99,7 @@ func AirlineAircraftTable(a models.AircraftTable) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, col := range a.Column {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<th class=\"font-extrabold text-sm w-28\"><div class=\"flex justify-start align-middle\" hx-boost>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<th class=\"font-extrabold text-sm w-28\"><div class=\"flex justify-start align-middle\" hx-boost:inherited=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

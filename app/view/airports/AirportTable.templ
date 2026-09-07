@@ -35,7 +35,7 @@ templ AirportTableComponent(airport models.AirportTable) {
 					<tr>
 						for _, col := range airport.Column {
 							<th class="font-extrabold text-sm">
-								<div class="flex justify-start align-middle" hx-boost>
+								<div class="flex justify-start align-middle" hx-boost:inherited="true">
 									{ col.Title }
 									<form class="join" hx-boost="true" method="get">
 										<a
@@ -54,7 +54,7 @@ templ AirportTableComponent(airport models.AirportTable) {
 				<tbody>
 					for _, airport := range airport.Airports {
 						<tr class="hover">
-							<td hx-boost="true">
+							<td hx-boost:inherited="true">
 								<a
 									hx-trigger="load delay:5ms"
 									href={ templ.SafeURL(fmt.Sprintf("/airports/details/%d", airport.AirportID)) }

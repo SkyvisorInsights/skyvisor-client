@@ -167,7 +167,7 @@ export function initLiveRefresh(root = document) {
   })
 }
 
-// Called from htmx:beforeCleanupElement so a swapped-away element drops its
+// Called from htmx:before:cleanup so a swapped-away element drops its
 // subscription instead of leaking a reference to a detached node.
 export function releaseLiveElement(element) {
   const release = element && element._skyvisorLiveRelease
