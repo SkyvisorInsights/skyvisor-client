@@ -1,4 +1,7 @@
 import 'htmx.org'
+// htmx 4 can morph rather than replace, and a morph discards Alpine component
+// state. This is part of the stack, not a migration bridge.
+import 'htmx.org/dist/ext/hx-alpine-compat.js'
 import Alpine from 'alpinejs'
 import { applyTheme, currentTheme, initThemeWatcher } from './core/theme.js'
 import { initMotion } from './core/motion.js'
@@ -160,16 +163,21 @@ if (document.readyState === 'loading') {
   boot()
 }
 
-document.body.addEventListener('htmx:afterSwap', (event) => {
-  boot(event.detail.target)
+// htmx 4 renamed these events and moved the swap target: detail.target is gone,
+// and the target now lives on the request context as detail.ctx.target. The
+// event's own target is the element that made the request, not the one swapped.
+document.body.addEventListener('htmx:after:swap', (event) => {
+  boot(event.detail.ctx.target)
   // A swap that carried a new globe envelope updates the existing map in place.
   if (window.SkyVisorMap && document.getElementById('globe-bootstrap')) {
-    window.SkyVisorMap.refresh(event.detail.target)
+    window.SkyVisorMap.refresh(event.detail.ctx.target)
   }
 })
 
-document.body.addEventListener('htmx:beforeCleanupElement', (event) => {
-  releaseLiveElement(event.detail.elt)
+// htmx:before:cleanup carries no detail at all; the element being torn down is
+// the event target.
+document.body.addEventListener('htmx:before:cleanup', (event) => {
+  releaseLiveElement(event.target)
 })
 
 initThemeWatcher()

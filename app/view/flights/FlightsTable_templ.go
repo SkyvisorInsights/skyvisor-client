@@ -111,7 +111,7 @@ func AllFlightsTableComponent(live models.FlightsTable) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, col := range live.Column {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<th class=\"font-extrabold text-sm\"><div class=\"flex justify-start align-middle\" hx-boost>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<th class=\"font-extrabold text-sm\"><div class=\"flex justify-start align-middle\" hx-boost:inherited=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -155,7 +155,7 @@ func AllFlightsTableComponent(live models.FlightsTable) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, lf := range live.Flights {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<tr class=\"hover\"><td hx-boost=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<tr class=\"hover\"><td hx-boost:inherited=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

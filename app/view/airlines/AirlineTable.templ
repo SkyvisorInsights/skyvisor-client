@@ -52,7 +52,7 @@ templ AirlineTable(a models.AirlineTable) {
 											<tbody class="bg-white divide-y divide-neutral-200">
 					for _, airline := range a.Airline {
 						<tr class="hover:bg-neutral-100">
-										<td class="px-6 py-4 whitespace-nowrap" hx-boost="true">
+										<td class="px-6 py-4 whitespace-nowrap" hx-boost:inherited="true">
 								<a
 									hx-trigger="load delay:50ms"
 									href={ templ.URL(fmt.Sprintf("/airlines/airline/%s", airline.AirlineName)) }

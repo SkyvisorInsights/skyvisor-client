@@ -43,7 +43,7 @@ templ SidebarComponent(sidebar []models.SidebarItem) {
 								<ul class="ml-2 space-y-2 focus:outline-none" id={ fmt.Sprintf("%d", index) }>
 									for _, subItem := range item.SubItems {
 										<li
-											hx-boost="true"
+											hx-boost:inherited="true"
 										>
 											<a
 												hx-trigger="load delay:50ms"

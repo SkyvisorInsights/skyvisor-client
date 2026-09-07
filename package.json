@@ -17,7 +17,7 @@
     "@fontsource-variable/geist": "5.2.9",
     "alpinejs": "3.15.12",
     "arc": "1.0.0",
-    "htmx.org": "2.0.10",
+    "htmx.org": "4.0.0",
     "maplibre-gl": "5.24.0",
     "motion": "12.23.12",
     "ol": "10.9.0"

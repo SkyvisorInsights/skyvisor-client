@@ -12,6 +12,11 @@ templ LayoutPage(l models.LayoutTempl) {
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			// htmx 4 swaps every response except 204 and 304, where htmx 2 left
+			// 4xx and 5xx alone. Every non-2xx this app returns is a plain-text
+			// http.Error, so none of them are page content; an element that does
+			// want one swapped opts in with hx-status:<code>.
+			<meta name="htmx-config" content='{"noSwap": [204, 304, "4xx", "5xx"]}'/>
 			<meta name="theme-color" content="#f7f9fc"/>
 			<meta name="description" content="Track flights, organize trips, and get useful travel alerts with SkyVisor Insight."/>
 			<title>{ l.Title } - SkyVisor Insight</title>
@@ -29,7 +34,7 @@ templ LayoutPage(l models.LayoutTempl) {
 			@orb.Script()
 			@components.PostHogSnippet()
 		</head>
-		<body hx-boost="true" x-data="appShell" lang="en">
+		<body hx-boost:inherited="true" x-data="appShell" lang="en">
 			<a href="#main-content" class="sr-only z-[60] rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
 			if l.Variant == models.LayoutCanvas {
 				<div class="relative flex h-[100dvh] flex-col overflow-hidden" id="contents">
