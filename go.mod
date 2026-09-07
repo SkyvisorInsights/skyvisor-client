@@ -39,7 +39,7 @@ require (
 require (
 	github.com/FACorreiaa/Thinking-orbs-go v0.0.0-20260722103214-7298eeaeb11d
 	github.com/Oudwins/tailwind-merge-go v0.2.3
-	github.com/SkyvisorInsights/skyvisor-go-shared v0.5.0
+	github.com/SkyvisorInsights/skyvisor-go-shared v0.6.0
 	github.com/a-h/templ v0.3.1020
 	github.com/coreos/go-oidc/v3 v3.20.0
 	github.com/getsentry/sentry-go v0.48.0
