@@ -28,7 +28,7 @@ templ AirlineTaxTable(tax models.TaxTable) {
 					<tr>
 						for _, col := range tax.Column {
 							<th class="font-extrabold text-sm">
-								<div class="flex justify-start align-middle" hx-boost>
+								<div class="flex justify-start align-middle" hx-boost:inherited="true">
 									{ col.Title }
 									<form class="join" hx-boost="true" method="get">
 										<a

@@ -30,7 +30,7 @@ templ CityTable(c models.CityTable) {
 					<tr>
 						for _, col := range c.Column {
 							<th class="font-extrabold text-sm">
-								<div class="flex justify-start align-middle" hx-boost>
+								<div class="flex justify-start align-middle" hx-boost:inherited="true">
 									{ col.Title }
 									<form class="join" hx-boost="true" method="get">
 										<a
@@ -49,7 +49,7 @@ templ CityTable(c models.CityTable) {
 				<tbody>
 					for _, city := range c.City {
 						<tr class="hover">
-							<td hx-boost="true">
+							<td hx-boost:inherited="true">
 								<a
 									hx-trigger="load delay:50ms"
 									href={ templ.SafeURL(fmt.Sprintf("/locations/city/details/%d", city.CityID)) }

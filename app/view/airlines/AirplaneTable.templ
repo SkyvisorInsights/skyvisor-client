@@ -29,7 +29,7 @@ templ AirplaneTable(a models.AirplaneTable) {
 				<thead class="bg-base-300">
 					for _, col := range a.Column {
 						<th class="font-extrabold text-sm">
-							<div class="flex justify-start align-middle" hx-boost>
+							<div class="flex justify-start align-middle" hx-boost:inherited="true">
 								{ col.Title }
 								<form class="join" hx-boost="true" method="get">
 									<a

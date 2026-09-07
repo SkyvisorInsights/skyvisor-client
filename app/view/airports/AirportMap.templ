@@ -193,7 +193,7 @@ templ AirportMap(data []models.Airport) {
 				<button id="zoom-out" class="btn btn-ghost mr-5">Zoom out</button>
 				<button id="zoom-in" class="btn btn-ghost">Zoom in</button>
 			</div>
-			<div hx-boost="true" id="map" class="map" tabindex="0"><button aria-describedby="popup" data-tippy-content="popup" id="popup"></button></div>
+			<div hx-boost:inherited="true" id="map" class="map" tabindex="0"><button aria-describedby="popup" data-tippy-content="popup" id="popup"></button></div>
 			<div class="w-full form-control">
 				<div class="label">
 					<span class="label-text font-semi-bold text-xs badge-xs badge pb-0">Display number of markers</span>

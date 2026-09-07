@@ -104,10 +104,10 @@ func globePartial(r *http.Request) string {
 	case "globe":
 		return "globe"
 	}
-	switch strings.TrimSpace(r.Header.Get("HX-Target")) {
-	case "globe-panels", "#globe-panels":
+	switch hxTargetID(r) {
+	case "globe-panels":
 		return "globe-panels"
-	case "globe-view", "#globe-view":
+	case "globe-view":
 		return "globe"
 	}
 	return ""

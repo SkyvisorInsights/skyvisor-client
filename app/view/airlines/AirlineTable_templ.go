@@ -143,7 +143,7 @@ func AirlineTable(a models.AirlineTable) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, airline := range a.Airline {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<tr class=\"hover:bg-neutral-100\"><td class=\"px-6 py-4 whitespace-nowrap\" hx-boost=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<tr class=\"hover:bg-neutral-100\"><td class=\"px-6 py-4 whitespace-nowrap\" hx-boost:inherited=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
