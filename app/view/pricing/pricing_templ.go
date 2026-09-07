@@ -33,7 +33,7 @@ var tiers = []tier{
 		Monthly:  "$0",
 		Yearly:   "$0",
 		Tagline:  "For travelers who want a calmer view of their next flight.",
-		Features: []string{"Live global map and flight search", "Up to 5 watched flights", "7-day flight history", "Basic itinerary explorer", "AI assistant with a daily limit", "Read-only MCP access"},
+		Features: []string{"Live global map and flight search", "Up to 5 watched flights", "7-day flight history", "Basic itinerary explorer", "AI assistant with a daily limit", "MCP agent access with a daily action budget"},
 		CTALabel: "Start free",
 		CTAHref:  "/register",
 	},

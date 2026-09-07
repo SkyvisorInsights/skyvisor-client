@@ -714,7 +714,7 @@ type Entitlements struct {
 	CanTeamShare       bool  `json:"can_team_share"`
 	EmailAlerts        bool  `json:"email_alerts"`
 
-	// McpDailyActionLimit -1 unlimited; Free 0 (read-only MCP)
+	// McpDailyActionLimit -1 unlimited; Free 5
 	McpDailyActionLimit int `json:"mcp_daily_action_limit"`
 
 	// McpDailyReadLimit -1 unlimited; Free 100
