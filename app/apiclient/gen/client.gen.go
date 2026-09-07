@@ -397,6 +397,35 @@ type Account struct {
 // AccountPlan defines model for Account.Plan.
 type AccountPlan string
 
+// AgentInboxAck defines model for AgentInboxAck.
+type AgentInboxAck struct {
+	Acknowledged int `json:"acknowledged"`
+	Pending      int `json:"pending"`
+}
+
+// AgentInboxEvent defines model for AgentInboxEvent.
+type AgentInboxEvent struct {
+	At      time.Time          `json:"at"`
+	Flight  *Flight            `json:"flight,omitempty"`
+	Id      openapi_types.UUID `json:"id"`
+	Message *string            `json:"message,omitempty"`
+
+	// Type Same event types the watch stream emits
+	Type    string              `json:"type"`
+	WatchId *openapi_types.UUID `json:"watch_id,omitempty"`
+}
+
+// AgentInboxPage defines model for AgentInboxPage.
+type AgentInboxPage struct {
+	Events []AgentInboxEvent `json:"events"`
+
+	// Pending Total unacknowledged, including beyond this page
+	Pending int `json:"pending"`
+
+	// Truncated True when pending exceeds what this page returned
+	Truncated bool `json:"truncated"`
+}
+
 // AirportBoard defines model for AirportBoard.
 type AirportBoard struct {
 	Arrivals    []Flight  `json:"arrivals"`
@@ -1392,6 +1421,17 @@ type AdminSetAccountPlanJSONBody struct {
 // AdminSetAccountPlanJSONBodyPlan defines parameters for AdminSetAccountPlan.
 type AdminSetAccountPlanJSONBodyPlan string
 
+// ListAgentInboxParams defines parameters for ListAgentInbox.
+type ListAgentInboxParams struct {
+	// Limit Page size; values above the maximum are clamped
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// AckAgentInboxJSONBody defines parameters for AckAgentInbox.
+type AckAgentInboxJSONBody struct {
+	EventIds []openapi_types.UUID `json:"event_ids"`
+}
+
 // GetAirportBoardParams defines parameters for GetAirportBoard.
 type GetAirportBoardParams struct {
 	Direction *GetAirportBoardParamsDirection `form:"direction,omitempty" json:"direction,omitempty"`
@@ -1561,6 +1601,9 @@ type OauthTokenFormdataRequestBody OauthTokenFormdataBody
 
 // AdminSetAccountPlanJSONRequestBody defines body for AdminSetAccountPlan for application/json ContentType.
 type AdminSetAccountPlanJSONRequestBody AdminSetAccountPlanJSONBody
+
+// AckAgentInboxJSONRequestBody defines body for AckAgentInbox for application/json ContentType.
+type AckAgentInboxJSONRequestBody AckAgentInboxJSONBody
 
 // AskTravelAssistantJSONRequestBody defines body for AskTravelAssistant for application/json ContentType.
 type AskTravelAssistantJSONRequestBody AskTravelAssistantJSONBody
@@ -1735,6 +1778,14 @@ type ClientInterface interface {
 	AdminSetAccountPlanWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	AdminSetAccountPlan(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListAgentInbox request
+	ListAgentInbox(ctx context.Context, params *ListAgentInboxParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AckAgentInboxWithBody request with any body
+	AckAgentInboxWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AckAgentInbox(ctx context.Context, body AckAgentInboxJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetAirportBoard request
 	GetAirportBoard(ctx context.Context, iata string, params *GetAirportBoardParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -2106,6 +2157,42 @@ func (c *Client) AdminSetAccountPlanWithBody(ctx context.Context, id string, con
 
 func (c *Client) AdminSetAccountPlan(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminSetAccountPlanRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListAgentInbox(ctx context.Context, params *ListAgentInboxParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListAgentInboxRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AckAgentInboxWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAckAgentInboxRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AckAgentInbox(ctx context.Context, body AckAgentInboxJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAckAgentInboxRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3482,6 +3569,95 @@ func NewAdminSetAccountPlanRequestWithBody(server string, id string, contentType
 	}
 
 	operationPath := fmt.Sprintf("/v1/admin/accounts/%s/plan", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListAgentInboxRequest generates requests for ListAgentInbox
+func NewListAgentInboxRequest(server string, params *ListAgentInboxParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/agent/inbox")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAckAgentInboxRequest calls the generic AckAgentInbox builder with application/json body
+func NewAckAgentInboxRequest(server string, body AckAgentInboxJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAckAgentInboxRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAckAgentInboxRequestWithBody generates requests for AckAgentInbox with any type of body
+func NewAckAgentInboxRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/agent/inbox/ack")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6093,6 +6269,14 @@ type ClientWithResponsesInterface interface {
 
 	AdminSetAccountPlanWithResponse(ctx context.Context, id string, body AdminSetAccountPlanJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminSetAccountPlanResp, error)
 
+	// ListAgentInboxWithResponse request
+	ListAgentInboxWithResponse(ctx context.Context, params *ListAgentInboxParams, reqEditors ...RequestEditorFn) (*ListAgentInboxResp, error)
+
+	// AckAgentInboxWithBodyWithResponse request with any body
+	AckAgentInboxWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AckAgentInboxResp, error)
+
+	AckAgentInboxWithResponse(ctx context.Context, body AckAgentInboxJSONRequestBody, reqEditors ...RequestEditorFn) (*AckAgentInboxResp, error)
+
 	// GetAirportBoardWithResponse request
 	GetAirportBoardWithResponse(ctx context.Context, iata string, params *GetAirportBoardParams, reqEditors ...RequestEditorFn) (*GetAirportBoardResp, error)
 
@@ -6541,6 +6725,52 @@ func (r AdminSetAccountPlanResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AdminSetAccountPlanResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListAgentInboxResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AgentInboxPage
+	JSON401      *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r ListAgentInboxResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListAgentInboxResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AckAgentInboxResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AgentInboxAck
+	JSON401      *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r AckAgentInboxResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AckAgentInboxResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -8013,6 +8243,32 @@ func (c *ClientWithResponses) AdminSetAccountPlanWithResponse(ctx context.Contex
 	return ParseAdminSetAccountPlanResp(rsp)
 }
 
+// ListAgentInboxWithResponse request returning *ListAgentInboxResp
+func (c *ClientWithResponses) ListAgentInboxWithResponse(ctx context.Context, params *ListAgentInboxParams, reqEditors ...RequestEditorFn) (*ListAgentInboxResp, error) {
+	rsp, err := c.ListAgentInbox(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListAgentInboxResp(rsp)
+}
+
+// AckAgentInboxWithBodyWithResponse request with arbitrary body returning *AckAgentInboxResp
+func (c *ClientWithResponses) AckAgentInboxWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AckAgentInboxResp, error) {
+	rsp, err := c.AckAgentInboxWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAckAgentInboxResp(rsp)
+}
+
+func (c *ClientWithResponses) AckAgentInboxWithResponse(ctx context.Context, body AckAgentInboxJSONRequestBody, reqEditors ...RequestEditorFn) (*AckAgentInboxResp, error) {
+	rsp, err := c.AckAgentInbox(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAckAgentInboxResp(rsp)
+}
+
 // GetAirportBoardWithResponse request returning *GetAirportBoardResp
 func (c *ClientWithResponses) GetAirportBoardWithResponse(ctx context.Context, iata string, params *GetAirportBoardParams, reqEditors ...RequestEditorFn) (*GetAirportBoardResp, error) {
 	rsp, err := c.GetAirportBoard(ctx, iata, params, reqEditors...)
@@ -8972,6 +9228,72 @@ func ParseAdminSetAccountPlanResp(rsp *http.Response) (*AdminSetAccountPlanResp,
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListAgentInboxResp parses an HTTP response from a ListAgentInboxWithResponse call
+func ParseListAgentInboxResp(rsp *http.Response) (*ListAgentInboxResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListAgentInboxResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AgentInboxPage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAckAgentInboxResp parses an HTTP response from a AckAgentInboxWithResponse call
+func ParseAckAgentInboxResp(rsp *http.Response) (*AckAgentInboxResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AckAgentInboxResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AgentInboxAck
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
