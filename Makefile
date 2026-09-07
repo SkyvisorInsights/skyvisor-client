@@ -1,4 +1,4 @@
-.PHONY: assets basemap build dev generate api-client migrate infra-up infra-down test verify hooks fmt lint-go
+.PHONY: assets basemap build dev generate api-client migrate infra-up infra-down test verify hooks fmt lint-go verify-pinned
 
 OPENAPI_SPEC ?= ../skyvisor-api/api/openapi.yaml
 
@@ -30,6 +30,13 @@ test:
 verify: assets generate test
 	go vet ./...
 	go build ./cmd/...
+
+verify-pinned: assets generate ## Build as the container does: no go.work, so go.mod pins decide
+	# go.work resolves skyvisor-go-shared to the local checkout. The Docker
+	# build has no workspace and compiles against the published version, so a
+	# stale pin fails there and nowhere else — it already has once.
+	GOWORK=off go build ./...
+	GOWORK=off go test ./...
 
 dev:
 	air -c .air.toml
