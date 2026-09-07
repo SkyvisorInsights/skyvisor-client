@@ -146,7 +146,7 @@ func SidebarComponent(sidebar []models.SidebarItem) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				for _, subItem := range item.SubItems {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<li hx-boost=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<li hx-boost:inherited=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

@@ -64,8 +64,7 @@ func (h *Handler) TrackFlight(w http.ResponseWriter, r *http.Request) error {
 
 	lookup := components.FlightLookupResultAuth(flightNumber, result, message, canWatch, csrf.Token(r), isAuthenticated, watchID, shareURL, shareFlash)
 	if r.URL.Query().Get("partial") == "flight" {
-		target := strings.TrimSpace(r.Header.Get("HX-Target"))
-		if target == "flight-result" || target == "#flight-result" {
+		if hxTargetID(r) == "flight-result" {
 			return components.FlightLookupResultContainer(lookup).Render(r.Context(), w)
 		}
 		return lookup.Render(r.Context(), w)

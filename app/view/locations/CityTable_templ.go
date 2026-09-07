@@ -99,7 +99,7 @@ func CityTable(c models.CityTable) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, col := range c.Column {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<th class=\"font-extrabold text-sm\"><div class=\"flex justify-start align-middle\" hx-boost>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<th class=\"font-extrabold text-sm\"><div class=\"flex justify-start align-middle\" hx-boost:inherited=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -143,7 +143,7 @@ func CityTable(c models.CityTable) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, city := range c.City {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<tr class=\"hover\"><td hx-boost=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<tr class=\"hover\"><td hx-boost:inherited=\"true\"><a hx-trigger=\"load delay:50ms\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
