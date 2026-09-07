@@ -1,0 +1,56 @@
+# SkyVisor
+
+> Flight and aviation-operations intelligence with a first-class agent
+> interface. SkyVisor tracks flights, airport delays, and cargo disruption, and
+> records the operational decisions taken in response so their accuracy can be
+> measured afterwards.
+
+SkyVisor is built to be driven by an AI agent as much as by a person. The MCP
+server exposes the same capabilities the web app has, and connects over OAuth
+in one click — no API key to copy.
+
+## Connect an agent
+
+- MCP endpoint: https://mcp.skyvisor.app
+- Transport: MCP streamable HTTP
+- Auth: OAuth 2.1 with dynamic client registration (RFC 7591) and PKCE S256
+- Discovery: https://mcp.skyvisor.app/.well-known/oauth-protected-resource
+- Claude Code: `claude mcp add --transport http skyvisor https://mcp.skyvisor.app`
+
+Scopes: `skyvisor:read` for every read tool, `skyvisor:act` to also allow the
+action tools. A read-only connection is refused writes rather than failing
+ambiguously.
+
+## What an agent can do
+
+Read: current flight records, airport arrival and departure boards, on-time and
+delay analytics, cargo and logistics disruption snapshots, saved trips and
+flight watches, the operational case queue, and measured decision-trust metrics
+(precision, false-positive rate, lead time, action success).
+
+Act: create trips and flight watches, open operational cases with their
+shipment or passenger dependencies and SLA exposure, record decisions with
+prediction and confidence, approve or execute them, and record the actual
+outcome and avoided cost. Configure signed webhooks for workflow delivery.
+
+Reason: ask a grounded travel assistant with optional trip context, or run a
+delay what-if against one segment to re-score connections without persisting
+anything.
+
+## Notable
+
+Most flight APIs answer questions. SkyVisor also records what was decided and
+then scores whether the decision was right, so an agent operating it can be
+held to a measured track record rather than a claim.
+
+## Plans
+
+Free includes a daily read allowance plus a small action budget, so an agent's
+first write works without a paid plan. Pro and Business raise the quotas and
+unlock export, logistics, and team sharing.
+
+## Links
+
+- Web app: https://skyvisor.app
+- Agent and MCP docs: https://skyvisor.app/mcp
+- Pricing: https://skyvisor.app/pricing

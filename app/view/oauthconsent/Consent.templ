@@ -1,0 +1,153 @@
+package oauthconsent
+
+import (
+	"github.com/SkyvisorInsights/Aviation-tracker/app/apiclient"
+	"github.com/SkyvisorInsights/Aviation-tracker/app/view/components"
+)
+
+// ConsentRequest is everything the page needs to describe the grant and echo
+// the authorization parameters back on submit.
+type ConsentRequest struct {
+	Client        apiclient.OAuthClientInfo
+	RedirectURI   string
+	CodeChallenge string
+	State         string
+	Scope         string
+	Resource      string
+	Error         string
+}
+
+// ConsentPage asks the signed-in user whether to let a registered MCP client
+// act on their account. The client name comes from the API rather than the
+// query string, so the page cannot be made to vouch for an attacker's label.
+templ ConsentPage(req ConsentRequest) {
+	<section class="relative mx-auto w-full max-w-2xl px-5 py-12 sm:px-8">
+		// The connect funnel is the one measurement that says whether agent
+		// distribution works, so both steps are captured: reaching consent and
+		// approving it.
+		if req.Client.ClientID != "" {
+			@components.PostHogCapture("mcp_connect_viewed", components.PostHogProperties(map[string]string{
+				"client_id":   req.Client.ClientID,
+				"client_name": req.Client.ClientName,
+				"scope":       req.Scope,
+			}))
+		}
+		<div class="sky-grid pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 opacity-35"></div>
+		<div class="overflow-hidden rounded-xl border border-border bg-card">
+			<div class="border-b border-border px-6 py-5">
+				<p class="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Connect an agent</p>
+				<h1 class="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+					Allow { clientLabel(req.Client) } to access SkyVisor?
+				</h1>
+				<p class="mt-3 text-sm leading-6 text-muted-foreground">
+					This connects an AI agent to your account. It will act with the permissions you approve below,
+					and you can disconnect it at any time from the MCP and agents page.
+				</p>
+			</div>
+
+			if req.Error != "" {
+				<p class="mx-6 mt-5 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">{ req.Error }</p>
+			}
+
+			<div class="px-6 py-5">
+				<h2 class="text-sm font-semibold">This agent will be able to</h2>
+				<ul class="mt-3 space-y-3">
+					@permission("Read your flight and operations data", "Flights, airport boards, analytics, trips, watches, cases, and decision trust.")
+					if grantsActions(req.Scope) {
+						@permission("Take actions on your behalf", "Create trips and watches, and record operational cases and decisions. Subject to your plan's daily action quota.")
+					} else {
+						@readOnlyNote()
+					}
+				</ul>
+
+				<dl class="mt-6 space-y-2 rounded-md border border-border bg-muted/40 px-4 py-3 text-xs">
+					@detail("Returns to", req.RedirectURI)
+					if req.Resource != "" {
+						@detail("For resource", req.Resource)
+					}
+					@detail("Requested scope", req.Scope)
+				</dl>
+			</div>
+
+			<div class="flex flex-col gap-3 border-t border-border px-6 py-5 sm:flex-row-reverse">
+				<form method="POST" action="/oauth/consent" class="sm:w-auto" data-ph-event="mcp_connected" data-ph-client={ req.Client.ClientID } data-ph-client-name={ req.Client.ClientName } data-ph-scope={ req.Scope }>
+					@hiddenFields(req)
+					<input type="hidden" name="decision" value="approve"/>
+					<button type="submit" class="w-full rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 sm:w-auto">
+						Allow access
+					</button>
+				</form>
+				<form method="POST" action="/oauth/consent" class="sm:w-auto">
+					@hiddenFields(req)
+					<input type="hidden" name="decision" value="deny"/>
+					<button type="submit" class="w-full rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted sm:w-auto">
+						Cancel
+					</button>
+				</form>
+			</div>
+		</div>
+		<p class="mt-4 text-center text-xs text-muted-foreground">
+			Only allow agents you trust. SkyVisor never puts your credentials into an agent's prompt.
+		</p>
+		@approvalCapture()
+	</section>
+}
+
+// approvalCapture records the approval before the form navigates away. The
+// event is sent on submit rather than on the next page because approval
+// redirects straight back to the agent, so there is no later page of ours to
+// fire from.
+templ approvalCapture() {
+	<script>
+		(function () {
+			var form = document.querySelector('form[data-ph-event]');
+			if (!form || typeof window.posthog === 'undefined') return;
+			form.addEventListener('submit', function () {
+				window.posthog.capture(form.dataset.phEvent, {
+					client_id: form.dataset.phClient,
+					client_name: form.dataset.phClientName,
+					scope: form.dataset.phScope
+				});
+			});
+		})();
+	</script>
+}
+
+// hiddenFields echoes the authorization parameters. The API re-validates every
+// one of them against the registered client, so a tampered field is rejected
+// there rather than trusted because it round-tripped through this form.
+templ hiddenFields(req ConsentRequest) {
+	<input type="hidden" name="client_id" value={ req.Client.ClientID }/>
+	<input type="hidden" name="redirect_uri" value={ req.RedirectURI }/>
+	<input type="hidden" name="code_challenge" value={ req.CodeChallenge }/>
+	<input type="hidden" name="state" value={ req.State }/>
+	<input type="hidden" name="scope" value={ req.Scope }/>
+	<input type="hidden" name="resource" value={ req.Resource }/>
+}
+
+templ permission(title, detail string) {
+	<li class="flex gap-3">
+		<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary"></span>
+		<div>
+			<p class="text-sm font-medium text-foreground">{ title }</p>
+			<p class="mt-0.5 text-xs leading-5 text-muted-foreground">{ detail }</p>
+		</div>
+	</li>
+}
+
+templ readOnlyNote() {
+	<li class="flex gap-3">
+		<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground/50"></span>
+		<div>
+			<p class="text-sm font-medium text-muted-foreground">Not take any actions</p>
+			<p class="mt-0.5 text-xs leading-5 text-muted-foreground">This is a read-only connection. It cannot create trips, watches, or records.</p>
+		</div>
+	</li>
+}
+
+templ detail(label, value string) {
+	<div class="flex flex-wrap items-baseline justify-between gap-2">
+		<dt class="text-muted-foreground">{ label }</dt>
+		<dd class="break-all font-mono text-[11px] text-foreground">{ value }</dd>
+	</div>
+}
