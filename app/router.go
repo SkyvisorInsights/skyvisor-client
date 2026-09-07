@@ -164,6 +164,21 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 	} else {
 		r.Handle("/thinking-orbs/js/*", http.StripPrefix("/thinking-orbs/js/", http.FileServer(http.FS(scriptFS))))
 	}
+	// llms.txt describes the product and the MCP endpoint for agents and
+	// crawlers looking for tooling. Served from the root because that is where
+	// the convention says to look.
+	r.Get("/llms.txt", func(w http.ResponseWriter, _ *http.Request) {
+		file, err := staticFS.ReadFile("static/llms.txt")
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		w.Header().Set("Cache-Control", "public, max-age=3600")
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		if _, err := w.Write(file); err != nil {
+			slog.Error("write llms.txt", "error", err)
+		}
+	})
 	r.Get("/favicon.ico", func(w http.ResponseWriter, _ *http.Request) {
 		file, err := staticFS.ReadFile("static/favicon.ico")
 		if err != nil {
@@ -249,6 +264,10 @@ func Router(pool *pgxpool.Pool, sessionSecret []byte, cookieSecure bool, redisCl
 		auth.Post("/logistics/team", handler(h.LogisticsCreateTeam))
 		auth.Post("/logistics/team/join", handler(h.LogisticsJoinTeam))
 		auth.Get("/mcp", handler(h.MCPPlaygroundPage))
+		// OAuth consent for MCP clients. The API sends the browser here
+		// because it holds no session and cannot know who is signed in.
+		auth.Get("/oauth/consent", handler(h.OAuthConsentPage))
+		auth.Post("/oauth/consent", handler(h.OAuthConsentSubmit))
 		auth.Route("/operations/cases", func(operations chi.Router) {
 			operations.Get("/", handler(h.OperationalCasesPage))
 			operations.Post("/", handler(h.OperationalCasesCreate))

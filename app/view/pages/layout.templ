@@ -32,7 +32,7 @@ templ LayoutPage(l models.LayoutTempl) {
 			<script src="/static/js/arc.js"></script>
 			<script defer src="/static/js/app.js"></script>
 			@orb.Script()
-			@components.PostHogSnippet()
+			@components.PostHogSnippet(l.User)
 		</head>
 		<body hx-boost:inherited="true" x-data="appShell" lang="en">
 			<a href="#main-content" class="sr-only z-[60] rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>

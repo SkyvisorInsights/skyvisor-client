@@ -53,6 +53,21 @@ func actionLabel(usage apiclient.UsageSnapshot) string {
 	return "Actions enabled"
 }
 
+// oneClickSnippet is the connect instruction for a host that speaks OAuth.
+// This is the primary path: the client discovers the authorization server from
+// the MCP endpoint and opens a browser, so no token is ever pasted.
+func oneClickSnippet() string {
+	return `Add a custom connector in your agent host and point it at:
+
+  https://mcp.skyvisor.app
+
+Your host opens a browser, you approve the connection, and it is done.
+No token to copy.
+
+Claude Code:
+  claude mcp add --transport http skyvisor https://mcp.skyvisor.app`
+}
+
 func actionClass(usage apiclient.UsageSnapshot) string {
 	if usage.MCPDailyActionLimit == 0 {
 		return "bg-muted text-muted-foreground"
@@ -100,6 +115,9 @@ func configSnippet() string {
 
 func remoteSnippet() string {
 	return `Remote (staging): https://staging-mcp.skyvisor.app
-Header: Authorization: Bearer <OIDC access token>
-Transport: MCP streamable HTTP (MCP_TRANSPORT=http)`
+Header: Authorization: Bearer <token>
+Transport: MCP streamable HTTP (MCP_TRANSPORT=http)
+
+Prefer the one-click connector above. These manual paths remain for
+scripting and for hosts that cannot perform an OAuth flow.`
 }

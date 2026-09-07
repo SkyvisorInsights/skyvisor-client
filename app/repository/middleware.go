@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"net/http"
+	"net/url"
 
 	"github.com/SkyvisorInsights/Aviation-tracker/app/models"
 	"github.com/go-playground/validator/v10"
@@ -49,7 +50,15 @@ func (m *MiddlewareRepository) RequireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value(models.CtxKeyAuthUser)
 		if user == nil {
-			http.Redirect(w, r, "/login?return_to="+r.URL.Path, http.StatusSeeOther)
+			// Preserve the query string, not just the path. Pages whose
+			// parameters carry the request's meaning — OAuth consent above
+			// all, where they are the authorization request — are otherwise
+			// returned to in a broken state after signing in.
+			target := r.URL.Path
+			if r.URL.RawQuery != "" {
+				target += "?" + r.URL.RawQuery
+			}
+			http.Redirect(w, r, "/login?return_to="+url.QueryEscape(target), http.StatusSeeOther)
 			return
 		}
 

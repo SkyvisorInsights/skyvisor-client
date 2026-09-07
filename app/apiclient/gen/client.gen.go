@@ -233,9 +233,9 @@ const (
 
 // Defines values for SituationLayerGeometry.
 const (
-	None    SituationLayerGeometry = "none"
-	Point   SituationLayerGeometry = "point"
-	Polygon SituationLayerGeometry = "polygon"
+	SituationLayerGeometryNone    SituationLayerGeometry = "none"
+	SituationLayerGeometryPoint   SituationLayerGeometry = "point"
+	SituationLayerGeometryPolygon SituationLayerGeometry = "polygon"
 )
 
 // Defines values for SituationLayerKind.
@@ -299,6 +299,34 @@ const (
 	DecisionExecuted  WebhookIntegrationEvents = "decision.executed"
 	DecisionProposed  WebhookIntegrationEvents = "decision.proposed"
 	DecisionRejected  WebhookIntegrationEvents = "decision.rejected"
+)
+
+// Defines values for OauthAuthorizeParamsResponseType.
+const (
+	Code OauthAuthorizeParamsResponseType = "code"
+)
+
+// Defines values for OauthAuthorizeParamsCodeChallengeMethod.
+const (
+	S256 OauthAuthorizeParamsCodeChallengeMethod = "S256"
+)
+
+// Defines values for RegisterOAuthClientJSONBodyScope.
+const (
+	SkyvisorAct             RegisterOAuthClientJSONBodyScope = "skyvisor:act"
+	SkyvisorRead            RegisterOAuthClientJSONBodyScope = "skyvisor:read"
+	SkyvisorReadSkyvisorAct RegisterOAuthClientJSONBodyScope = "skyvisor:read skyvisor:act"
+)
+
+// Defines values for RegisterOAuthClientJSONBodyTokenEndpointAuthMethod.
+const (
+	RegisterOAuthClientJSONBodyTokenEndpointAuthMethodNone RegisterOAuthClientJSONBodyTokenEndpointAuthMethod = "none"
+)
+
+// Defines values for OauthTokenFormdataBodyGrantType.
+const (
+	AuthorizationCode OauthTokenFormdataBodyGrantType = "authorization_code"
+	RefreshToken      OauthTokenFormdataBodyGrantType = "refresh_token"
 )
 
 // Defines values for AdminSetAccountPlanJSONBodyPlan.
@@ -1284,11 +1312,77 @@ type WhatIfResult struct {
 	Trip                Trip              `json:"trip"`
 }
 
+// OAuthError defines model for OAuthError.
+type OAuthError struct {
+	Error            string  `json:"error"`
+	ErrorDescription *string `json:"error_description,omitempty"`
+}
+
 // ServiceUnavailable defines model for ServiceUnavailable.
 type ServiceUnavailable = Error
 
 // Unauthorized defines model for Unauthorized.
 type Unauthorized = Error
+
+// OauthAuthorizeParams defines parameters for OauthAuthorize.
+type OauthAuthorizeParams struct {
+	ResponseType OauthAuthorizeParamsResponseType `form:"response_type" json:"response_type"`
+	ClientId     string                           `form:"client_id" json:"client_id"`
+
+	// RedirectUri Required unless the client registered exactly one URI
+	RedirectUri         *string                                 `form:"redirect_uri,omitempty" json:"redirect_uri,omitempty"`
+	CodeChallenge       string                                  `form:"code_challenge" json:"code_challenge"`
+	CodeChallengeMethod OauthAuthorizeParamsCodeChallengeMethod `form:"code_challenge_method" json:"code_challenge_method"`
+	Scope               *string                                 `form:"scope,omitempty" json:"scope,omitempty"`
+	State               *string                                 `form:"state,omitempty" json:"state,omitempty"`
+
+	// Resource RFC 8707 resource indicator, bound to the issued token
+	Resource *string `form:"resource,omitempty" json:"resource,omitempty"`
+}
+
+// OauthAuthorizeParamsResponseType defines parameters for OauthAuthorize.
+type OauthAuthorizeParamsResponseType string
+
+// OauthAuthorizeParamsCodeChallengeMethod defines parameters for OauthAuthorize.
+type OauthAuthorizeParamsCodeChallengeMethod string
+
+// RegisterOAuthClientJSONBody defines parameters for RegisterOAuthClient.
+type RegisterOAuthClientJSONBody struct {
+	ClientName *string `json:"client_name,omitempty"`
+
+	// RedirectUris HTTPS, loopback HTTP, or a dotted private-use scheme. Matched exactly at authorization time.
+	RedirectUris            []string                                            `json:"redirect_uris"`
+	Scope                   *RegisterOAuthClientJSONBodyScope                   `json:"scope,omitempty"`
+	SoftwareId              *string                                             `json:"software_id,omitempty"`
+	SoftwareVersion         *string                                             `json:"software_version,omitempty"`
+	TokenEndpointAuthMethod *RegisterOAuthClientJSONBodyTokenEndpointAuthMethod `json:"token_endpoint_auth_method,omitempty"`
+}
+
+// RegisterOAuthClientJSONBodyScope defines parameters for RegisterOAuthClient.
+type RegisterOAuthClientJSONBodyScope string
+
+// RegisterOAuthClientJSONBodyTokenEndpointAuthMethod defines parameters for RegisterOAuthClient.
+type RegisterOAuthClientJSONBodyTokenEndpointAuthMethod string
+
+// OauthRevokeFormdataBody defines parameters for OauthRevoke.
+type OauthRevokeFormdataBody struct {
+	Token string `form:"token" json:"token"`
+}
+
+// OauthTokenFormdataBody defines parameters for OauthToken.
+type OauthTokenFormdataBody struct {
+	ClientId string  `form:"client_id" json:"client_id"`
+	Code     *string `form:"code,omitempty" json:"code,omitempty"`
+
+	// CodeVerifier RFC 7636 verifier, 43-128 unreserved characters
+	CodeVerifier *string                         `form:"code_verifier,omitempty" json:"code_verifier,omitempty"`
+	GrantType    OauthTokenFormdataBodyGrantType `form:"grant_type" json:"grant_type"`
+	RedirectUri  *string                         `form:"redirect_uri,omitempty" json:"redirect_uri,omitempty"`
+	RefreshToken *string                         `form:"refresh_token,omitempty" json:"refresh_token,omitempty"`
+}
+
+// OauthTokenFormdataBodyGrantType defines parameters for OauthToken.
+type OauthTokenFormdataBodyGrantType string
 
 // AdminSetAccountPlanJSONBody defines parameters for AdminSetAccountPlan.
 type AdminSetAccountPlanJSONBody struct {
@@ -1371,6 +1465,16 @@ type GetLogisticsOverviewParams struct {
 	Limit   *int    `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// ApproveOAuthGrantJSONBody defines parameters for ApproveOAuthGrant.
+type ApproveOAuthGrantJSONBody struct {
+	ClientId      string  `json:"client_id"`
+	CodeChallenge string  `json:"code_challenge"`
+	RedirectUri   *string `json:"redirect_uri,omitempty"`
+	Resource      *string `json:"resource,omitempty"`
+	Scope         *string `json:"scope,omitempty"`
+	State         *string `json:"state,omitempty"`
+}
+
 // ListOperationalCasesParams defines parameters for ListOperationalCases.
 type ListOperationalCasesParams struct {
 	Status *ListOperationalCasesParamsStatus `form:"status,omitempty" json:"status,omitempty"`
@@ -1446,6 +1550,15 @@ type CreateShareJSONBody struct {
 	Label *string `json:"label,omitempty"`
 }
 
+// RegisterOAuthClientJSONRequestBody defines body for RegisterOAuthClient for application/json ContentType.
+type RegisterOAuthClientJSONRequestBody RegisterOAuthClientJSONBody
+
+// OauthRevokeFormdataRequestBody defines body for OauthRevoke for application/x-www-form-urlencoded ContentType.
+type OauthRevokeFormdataRequestBody OauthRevokeFormdataBody
+
+// OauthTokenFormdataRequestBody defines body for OauthToken for application/x-www-form-urlencoded ContentType.
+type OauthTokenFormdataRequestBody OauthTokenFormdataBody
+
 // AdminSetAccountPlanJSONRequestBody defines body for AdminSetAccountPlan for application/json ContentType.
 type AdminSetAccountPlanJSONRequestBody AdminSetAccountPlanJSONBody
 
@@ -1463,6 +1576,9 @@ type CreateWebhookIntegrationJSONRequestBody = CreateWebhookIntegration
 
 // UpdatePreferencesJSONRequestBody defines body for UpdatePreferences for application/json ContentType.
 type UpdatePreferencesJSONRequestBody = Preferences
+
+// ApproveOAuthGrantJSONRequestBody defines body for ApproveOAuthGrant for application/json ContentType.
+type ApproveOAuthGrantJSONRequestBody ApproveOAuthGrantJSONBody
 
 // CreateOperationalCaseJSONRequestBody defines body for CreateOperationalCase for application/json ContentType.
 type CreateOperationalCaseJSONRequestBody = CreateOperationalCase
@@ -1582,8 +1698,29 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// OauthAuthorizationServerMetadata request
+	OauthAuthorizationServerMetadata(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// Health request
 	Health(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OauthAuthorize request
+	OauthAuthorize(ctx context.Context, params *OauthAuthorizeParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RegisterOAuthClientWithBody request with any body
+	RegisterOAuthClientWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RegisterOAuthClient(ctx context.Context, body RegisterOAuthClientJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OauthRevokeWithBody request with any body
+	OauthRevokeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OauthRevokeWithFormdataBody(ctx context.Context, body OauthRevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OauthTokenWithBody request with any body
+	OauthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OauthTokenWithFormdataBody(ctx context.Context, body OauthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPublicShare request
 	GetPublicShare(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1668,6 +1805,14 @@ type ClientInterface interface {
 	UpdatePreferencesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdatePreferences(ctx context.Context, body UpdatePreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ApproveOAuthGrantWithBody request with any body
+	ApproveOAuthGrantWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ApproveOAuthGrant(ctx context.Context, body ApproveOAuthGrantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DescribeOAuthClient request
+	DescribeOAuthClient(ctx context.Context, clientID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListOperationalCases request
 	ListOperationalCases(ctx context.Context, params *ListOperationalCasesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1803,8 +1948,104 @@ type ClientInterface interface {
 	CreateShare(ctx context.Context, id openapi_types.UUID, body CreateShareJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
+func (c *Client) OauthAuthorizationServerMetadata(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOauthAuthorizationServerMetadataRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) Health(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewHealthRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OauthAuthorize(ctx context.Context, params *OauthAuthorizeParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOauthAuthorizeRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RegisterOAuthClientWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRegisterOAuthClientRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RegisterOAuthClient(ctx context.Context, body RegisterOAuthClientJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRegisterOAuthClientRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OauthRevokeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOauthRevokeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OauthRevokeWithFormdataBody(ctx context.Context, body OauthRevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOauthRevokeRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OauthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOauthTokenRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OauthTokenWithFormdataBody(ctx context.Context, body OauthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOauthTokenRequestWithFormdataBody(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2165,6 +2406,42 @@ func (c *Client) UpdatePreferencesWithBody(ctx context.Context, contentType stri
 
 func (c *Client) UpdatePreferences(ctx context.Context, body UpdatePreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdatePreferencesRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ApproveOAuthGrantWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApproveOAuthGrantRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ApproveOAuthGrant(ctx context.Context, body ApproveOAuthGrantJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApproveOAuthGrantRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DescribeOAuthClient(ctx context.Context, clientID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDescribeOAuthClientRequest(c.Server, clientID)
 	if err != nil {
 		return nil, err
 	}
@@ -2763,6 +3040,33 @@ func (c *Client) CreateShare(ctx context.Context, id openapi_types.UUID, body Cr
 	return c.Client.Do(req)
 }
 
+// NewOauthAuthorizationServerMetadataRequest generates requests for OauthAuthorizationServerMetadata
+func NewOauthAuthorizationServerMetadataRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/.well-known/oauth-authorization-server")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewHealthRequest generates requests for Health
 func NewHealthRequest(server string) (*http.Request, error) {
 	var err error
@@ -2786,6 +3090,271 @@ func NewHealthRequest(server string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewOauthAuthorizeRequest generates requests for OauthAuthorize
+func NewOauthAuthorizeRequest(server string, params *OauthAuthorizeParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/authorize")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "response_type", runtime.ParamLocationQuery, params.ResponseType); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "client_id", runtime.ParamLocationQuery, params.ClientId); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.RedirectUri != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "redirect_uri", runtime.ParamLocationQuery, *params.RedirectUri); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code_challenge", runtime.ParamLocationQuery, params.CodeChallenge); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code_challenge_method", runtime.ParamLocationQuery, params.CodeChallengeMethod); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Scope != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "scope", runtime.ParamLocationQuery, *params.Scope); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.State != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "state", runtime.ParamLocationQuery, *params.State); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Resource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, *params.Resource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRegisterOAuthClientRequest calls the generic RegisterOAuthClient builder with application/json body
+func NewRegisterOAuthClientRequest(server string, body RegisterOAuthClientJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRegisterOAuthClientRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRegisterOAuthClientRequestWithBody generates requests for RegisterOAuthClient with any type of body
+func NewRegisterOAuthClientRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/register")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOauthRevokeRequestWithFormdataBody calls the generic OauthRevoke builder with application/x-www-form-urlencoded body
+func NewOauthRevokeRequestWithFormdataBody(server string, body OauthRevokeFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewOauthRevokeRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewOauthRevokeRequestWithBody generates requests for OauthRevoke with any type of body
+func NewOauthRevokeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/revoke")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOauthTokenRequestWithFormdataBody calls the generic OauthToken builder with application/x-www-form-urlencoded body
+func NewOauthTokenRequestWithFormdataBody(server string, body OauthTokenFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewOauthTokenRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewOauthTokenRequestWithBody generates requests for OauthToken with any type of body
+func NewOauthTokenRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/token")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -3908,6 +4477,80 @@ func NewUpdatePreferencesRequestWithBody(server string, contentType string, body
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewApproveOAuthGrantRequest calls the generic ApproveOAuthGrant builder with application/json body
+func NewApproveOAuthGrantRequest(server string, body ApproveOAuthGrantJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewApproveOAuthGrantRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewApproveOAuthGrantRequestWithBody generates requests for ApproveOAuthGrant with any type of body
+func NewApproveOAuthGrantRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/oauth/authorize")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDescribeOAuthClientRequest generates requests for DescribeOAuthClient
+func NewDescribeOAuthClientRequest(server string, clientID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "clientID", runtime.ParamLocationPath, clientID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -5412,8 +6055,29 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// OauthAuthorizationServerMetadataWithResponse request
+	OauthAuthorizationServerMetadataWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OauthAuthorizationServerMetadataResp, error)
+
 	// HealthWithResponse request
 	HealthWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*HealthResp, error)
+
+	// OauthAuthorizeWithResponse request
+	OauthAuthorizeWithResponse(ctx context.Context, params *OauthAuthorizeParams, reqEditors ...RequestEditorFn) (*OauthAuthorizeResp, error)
+
+	// RegisterOAuthClientWithBodyWithResponse request with any body
+	RegisterOAuthClientWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RegisterOAuthClientResp, error)
+
+	RegisterOAuthClientWithResponse(ctx context.Context, body RegisterOAuthClientJSONRequestBody, reqEditors ...RequestEditorFn) (*RegisterOAuthClientResp, error)
+
+	// OauthRevokeWithBodyWithResponse request with any body
+	OauthRevokeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OauthRevokeResp, error)
+
+	OauthRevokeWithFormdataBodyWithResponse(ctx context.Context, body OauthRevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*OauthRevokeResp, error)
+
+	// OauthTokenWithBodyWithResponse request with any body
+	OauthTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OauthTokenResp, error)
+
+	OauthTokenWithFormdataBodyWithResponse(ctx context.Context, body OauthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*OauthTokenResp, error)
 
 	// GetPublicShareWithResponse request
 	GetPublicShareWithResponse(ctx context.Context, token string, reqEditors ...RequestEditorFn) (*GetPublicShareResp, error)
@@ -5498,6 +6162,14 @@ type ClientWithResponsesInterface interface {
 	UpdatePreferencesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdatePreferencesResp, error)
 
 	UpdatePreferencesWithResponse(ctx context.Context, body UpdatePreferencesJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePreferencesResp, error)
+
+	// ApproveOAuthGrantWithBodyWithResponse request with any body
+	ApproveOAuthGrantWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveOAuthGrantResp, error)
+
+	ApproveOAuthGrantWithResponse(ctx context.Context, body ApproveOAuthGrantJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveOAuthGrantResp, error)
+
+	// DescribeOAuthClientWithResponse request
+	DescribeOAuthClientWithResponse(ctx context.Context, clientID string, reqEditors ...RequestEditorFn) (*DescribeOAuthClientResp, error)
 
 	// ListOperationalCasesWithResponse request
 	ListOperationalCasesWithResponse(ctx context.Context, params *ListOperationalCasesParams, reqEditors ...RequestEditorFn) (*ListOperationalCasesResp, error)
@@ -5633,6 +6305,28 @@ type ClientWithResponsesInterface interface {
 	CreateShareWithResponse(ctx context.Context, id openapi_types.UUID, body CreateShareJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateShareResp, error)
 }
 
+type OauthAuthorizationServerMetadataResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+}
+
+// Status returns HTTPResponse.Status
+func (r OauthAuthorizationServerMetadataResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OauthAuthorizationServerMetadataResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type HealthResp struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -5648,6 +6342,111 @@ func (r HealthResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r HealthResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OauthAuthorizeResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *OAuthError
+}
+
+// Status returns HTTPResponse.Status
+func (r OauthAuthorizeResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OauthAuthorizeResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RegisterOAuthClientResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *struct {
+		ClientId                string    `json:"client_id"`
+		ClientIdIssuedAt        *int      `json:"client_id_issued_at,omitempty"`
+		ClientName              *string   `json:"client_name,omitempty"`
+		GrantTypes              *[]string `json:"grant_types,omitempty"`
+		RedirectUris            []string  `json:"redirect_uris"`
+		Scope                   *string   `json:"scope,omitempty"`
+		TokenEndpointAuthMethod *string   `json:"token_endpoint_auth_method,omitempty"`
+	}
+	JSON400 *OAuthError
+}
+
+// Status returns HTTPResponse.Status
+func (r RegisterOAuthClientResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RegisterOAuthClientResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OauthRevokeResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *OAuthError
+}
+
+// Status returns HTTPResponse.Status
+func (r OauthRevokeResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OauthRevokeResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OauthTokenResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		AccessToken  string                 `json:"access_token"`
+		ExpiresIn    int                    `json:"expires_in"`
+		RefreshToken *string                `json:"refresh_token,omitempty"`
+		Scope        *string                `json:"scope,omitempty"`
+		TokenType    OauthToken200TokenType `json:"token_type"`
+	}
+	JSON400 *OAuthError
+}
+type OauthToken200TokenType string
+
+// Status returns HTTPResponse.Status
+func (r OauthTokenResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OauthTokenResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -6217,6 +7016,59 @@ func (r UpdatePreferencesResp) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdatePreferencesResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ApproveOAuthGrantResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		RedirectTo string `json:"redirect_to"`
+	}
+	JSON401 *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r ApproveOAuthGrantResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ApproveOAuthGrantResp) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DescribeOAuthClientResp struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		ClientId     string     `json:"client_id"`
+		ClientName   string     `json:"client_name"`
+		CreatedAt    *time.Time `json:"created_at,omitempty"`
+		RedirectUris *[]string  `json:"redirect_uris,omitempty"`
+	}
+	JSON401 *Unauthorized
+}
+
+// Status returns HTTPResponse.Status
+func (r DescribeOAuthClientResp) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DescribeOAuthClientResp) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -7039,6 +7891,15 @@ func (r CreateShareResp) StatusCode() int {
 	return 0
 }
 
+// OauthAuthorizationServerMetadataWithResponse request returning *OauthAuthorizationServerMetadataResp
+func (c *ClientWithResponses) OauthAuthorizationServerMetadataWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OauthAuthorizationServerMetadataResp, error) {
+	rsp, err := c.OauthAuthorizationServerMetadata(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOauthAuthorizationServerMetadataResp(rsp)
+}
+
 // HealthWithResponse request returning *HealthResp
 func (c *ClientWithResponses) HealthWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*HealthResp, error) {
 	rsp, err := c.Health(ctx, reqEditors...)
@@ -7046,6 +7907,66 @@ func (c *ClientWithResponses) HealthWithResponse(ctx context.Context, reqEditors
 		return nil, err
 	}
 	return ParseHealthResp(rsp)
+}
+
+// OauthAuthorizeWithResponse request returning *OauthAuthorizeResp
+func (c *ClientWithResponses) OauthAuthorizeWithResponse(ctx context.Context, params *OauthAuthorizeParams, reqEditors ...RequestEditorFn) (*OauthAuthorizeResp, error) {
+	rsp, err := c.OauthAuthorize(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOauthAuthorizeResp(rsp)
+}
+
+// RegisterOAuthClientWithBodyWithResponse request with arbitrary body returning *RegisterOAuthClientResp
+func (c *ClientWithResponses) RegisterOAuthClientWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RegisterOAuthClientResp, error) {
+	rsp, err := c.RegisterOAuthClientWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRegisterOAuthClientResp(rsp)
+}
+
+func (c *ClientWithResponses) RegisterOAuthClientWithResponse(ctx context.Context, body RegisterOAuthClientJSONRequestBody, reqEditors ...RequestEditorFn) (*RegisterOAuthClientResp, error) {
+	rsp, err := c.RegisterOAuthClient(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRegisterOAuthClientResp(rsp)
+}
+
+// OauthRevokeWithBodyWithResponse request with arbitrary body returning *OauthRevokeResp
+func (c *ClientWithResponses) OauthRevokeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OauthRevokeResp, error) {
+	rsp, err := c.OauthRevokeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOauthRevokeResp(rsp)
+}
+
+func (c *ClientWithResponses) OauthRevokeWithFormdataBodyWithResponse(ctx context.Context, body OauthRevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*OauthRevokeResp, error) {
+	rsp, err := c.OauthRevokeWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOauthRevokeResp(rsp)
+}
+
+// OauthTokenWithBodyWithResponse request with arbitrary body returning *OauthTokenResp
+func (c *ClientWithResponses) OauthTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OauthTokenResp, error) {
+	rsp, err := c.OauthTokenWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOauthTokenResp(rsp)
+}
+
+func (c *ClientWithResponses) OauthTokenWithFormdataBodyWithResponse(ctx context.Context, body OauthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*OauthTokenResp, error) {
+	rsp, err := c.OauthTokenWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOauthTokenResp(rsp)
 }
 
 // GetPublicShareWithResponse request returning *GetPublicShareResp
@@ -7310,6 +8231,32 @@ func (c *ClientWithResponses) UpdatePreferencesWithResponse(ctx context.Context,
 		return nil, err
 	}
 	return ParseUpdatePreferencesResp(rsp)
+}
+
+// ApproveOAuthGrantWithBodyWithResponse request with arbitrary body returning *ApproveOAuthGrantResp
+func (c *ClientWithResponses) ApproveOAuthGrantWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveOAuthGrantResp, error) {
+	rsp, err := c.ApproveOAuthGrantWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseApproveOAuthGrantResp(rsp)
+}
+
+func (c *ClientWithResponses) ApproveOAuthGrantWithResponse(ctx context.Context, body ApproveOAuthGrantJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveOAuthGrantResp, error) {
+	rsp, err := c.ApproveOAuthGrant(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseApproveOAuthGrantResp(rsp)
+}
+
+// DescribeOAuthClientWithResponse request returning *DescribeOAuthClientResp
+func (c *ClientWithResponses) DescribeOAuthClientWithResponse(ctx context.Context, clientID string, reqEditors ...RequestEditorFn) (*DescribeOAuthClientResp, error) {
+	rsp, err := c.DescribeOAuthClient(ctx, clientID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDescribeOAuthClientResp(rsp)
 }
 
 // ListOperationalCasesWithResponse request returning *ListOperationalCasesResp
@@ -7739,6 +8686,32 @@ func (c *ClientWithResponses) CreateShareWithResponse(ctx context.Context, id op
 	return ParseCreateShareResp(rsp)
 }
 
+// ParseOauthAuthorizationServerMetadataResp parses an HTTP response from a OauthAuthorizationServerMetadataWithResponse call
+func ParseOauthAuthorizationServerMetadataResp(rsp *http.Response) (*OauthAuthorizationServerMetadataResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OauthAuthorizationServerMetadataResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseHealthResp parses an HTTP response from a HealthWithResponse call
 func ParseHealthResp(rsp *http.Response) (*HealthResp, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -7750,6 +8723,138 @@ func ParseHealthResp(rsp *http.Response) (*HealthResp, error) {
 	response := &HealthResp{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseOauthAuthorizeResp parses an HTTP response from a OauthAuthorizeWithResponse call
+func ParseOauthAuthorizeResp(rsp *http.Response) (*OauthAuthorizeResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OauthAuthorizeResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRegisterOAuthClientResp parses an HTTP response from a RegisterOAuthClientWithResponse call
+func ParseRegisterOAuthClientResp(rsp *http.Response) (*RegisterOAuthClientResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RegisterOAuthClientResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			ClientId                string    `json:"client_id"`
+			ClientIdIssuedAt        *int      `json:"client_id_issued_at,omitempty"`
+			ClientName              *string   `json:"client_name,omitempty"`
+			GrantTypes              *[]string `json:"grant_types,omitempty"`
+			RedirectUris            []string  `json:"redirect_uris"`
+			Scope                   *string   `json:"scope,omitempty"`
+			TokenEndpointAuthMethod *string   `json:"token_endpoint_auth_method,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOauthRevokeResp parses an HTTP response from a OauthRevokeWithResponse call
+func ParseOauthRevokeResp(rsp *http.Response) (*OauthRevokeResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OauthRevokeResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOauthTokenResp parses an HTTP response from a OauthTokenWithResponse call
+func ParseOauthTokenResp(rsp *http.Response) (*OauthTokenResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OauthTokenResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			AccessToken  string                 `json:"access_token"`
+			ExpiresIn    int                    `json:"expires_in"`
+			RefreshToken *string                `json:"refresh_token,omitempty"`
+			Scope        *string                `json:"scope,omitempty"`
+			TokenType    OauthToken200TokenType `json:"token_type"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
 	}
 
 	return response, nil
@@ -8506,6 +9611,79 @@ func ParseUpdatePreferencesResp(rsp *http.Response) (*UpdatePreferencesResp, err
 			// Account Internal SkyVisor account. Stable across identity providers.
 			Account      Account      `json:"account"`
 			Entitlements Entitlements `json:"entitlements"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseApproveOAuthGrantResp parses an HTTP response from a ApproveOAuthGrantWithResponse call
+func ParseApproveOAuthGrantResp(rsp *http.Response) (*ApproveOAuthGrantResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ApproveOAuthGrantResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			RedirectTo string `json:"redirect_to"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Unauthorized
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDescribeOAuthClientResp parses an HTTP response from a DescribeOAuthClientWithResponse call
+func ParseDescribeOAuthClientResp(rsp *http.Response) (*DescribeOAuthClientResp, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DescribeOAuthClientResp{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			ClientId     string     `json:"client_id"`
+			ClientName   string     `json:"client_name"`
+			CreatedAt    *time.Time `json:"created_at,omitempty"`
+			RedirectUris *[]string  `json:"redirect_uris,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

@@ -83,6 +83,9 @@ type (
 	CreateTrustShare          = domain.CreateTrustShare
 	TrustShareLink            = domain.TrustShareLink
 	PublicTrustReport         = domain.PublicTrustReport
+	OAuthClientInfo           = domain.OAuthClientInfo
+	ApproveOAuthGrant         = domain.ApproveOAuthGrant
+	OAuthGrantApproval        = domain.OAuthGrantApproval
 )
 
 func New(baseURL string) (*Client, error) {
