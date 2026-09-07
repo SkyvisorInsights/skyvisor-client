@@ -87,21 +87,7 @@ func (h *Handler) OAuthConsentSubmit(w http.ResponseWriter, r *http.Request) err
 	}
 
 	if r.PostFormValue("decision") != "approve" {
-		// Only bounce a denial back to a redirect URI that looks like one. A
-		// bad value here would make this page an open redirector, so anything
-		// unparseable ends on our own page instead.
-		if target, err := url.Parse(input.RedirectURI); err == nil && target.IsAbs() {
-			q := target.Query()
-			q.Set("error", "access_denied")
-			q.Set("error_description", "The user declined the connection request")
-			if input.State != "" {
-				q.Set("state", input.State)
-			}
-			target.RawQuery = q.Encode()
-			http.Redirect(w, r, target.String(), http.StatusSeeOther)
-			return nil
-		}
-		http.Redirect(w, r, "/mcp", http.StatusSeeOther)
+		h.denyConsent(w, r, accessToken, input)
 		return nil
 	}
 
@@ -113,6 +99,59 @@ func (h *Handler) OAuthConsentSubmit(w http.ResponseWriter, r *http.Request) err
 	}
 	http.Redirect(w, r, approval.RedirectTo, http.StatusSeeOther)
 	return nil
+}
+
+// denyConsent returns the standard access_denied error to the agent so it
+// learns the outcome instead of hanging.
+//
+// The redirect target must be checked against the client's registered URIs
+// first. Every value on this form arrived in the query string of whatever link
+// opened the page, so an attacker can point redirect_uri anywhere; bouncing to
+// it unchecked would turn the consent page into an open redirector on a
+// trusted origin, triggered by the user clicking Cancel — the cautious choice.
+// Being absolute and parseable is not the same as being registered.
+//
+// The approve path needs no equivalent check: the API re-validates redirect_uri
+// against the registered set before returning anywhere to send the browser.
+func (h *Handler) denyConsent(w http.ResponseWriter, r *http.Request, accessToken string, input apiclient.ApproveOAuthGrant) {
+	if !h.deniedRedirectAllowed(r, accessToken, input) {
+		http.Redirect(w, r, "/mcp", http.StatusSeeOther)
+		return
+	}
+	target, err := url.Parse(input.RedirectURI)
+	if err != nil {
+		http.Redirect(w, r, "/mcp", http.StatusSeeOther)
+		return
+	}
+	q := target.Query()
+	q.Set("error", "access_denied")
+	q.Set("error_description", "The user declined the connection request")
+	if input.State != "" {
+		q.Set("state", input.State)
+	}
+	target.RawQuery = q.Encode()
+	http.Redirect(w, r, target.String(), http.StatusSeeOther)
+}
+
+// deniedRedirectAllowed reports whether the target is registered to the client,
+// matching exactly as the API does. Anything unresolvable is refused: failing
+// closed here costs the agent a tidy error and costs an attacker the redirect.
+func (h *Handler) deniedRedirectAllowed(r *http.Request, accessToken string, input apiclient.ApproveOAuthGrant) bool {
+	if input.ClientID == "" || input.RedirectURI == "" || h.service.API() == nil {
+		return false
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 8*time.Second)
+	defer cancel()
+	client, err := h.service.API().DescribeOAuthClient(ctx, accessToken, input.ClientID)
+	if err != nil {
+		return false
+	}
+	for _, registered := range client.RedirectURIs {
+		if registered == input.RedirectURI {
+			return true
+		}
+	}
+	return false
 }
 
 // renderConsentError shows a dead end on our own page rather than redirecting,
