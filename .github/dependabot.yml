@@ -1,16 +1,25 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
+# Dependency update PRs. Weekly, grouped, so they arrive as a few PRs, not dozens.
 version: 2
 updates:
-  - package-ecosystem: "gomod" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: gomod
+    directory: /
     schedule:
       interval: weekly
+    groups:
+      go-modules:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
+
+  # Bumps Dockerfile base image tags (and digests, where pinned).
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
